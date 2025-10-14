@@ -32,17 +32,17 @@ public class MovieController {
 
   @PostMapping
   public MovieDTO addMovie(
-      /*@AuthenticationPrincipal UserDetails user*/ String userName,
+      /*@AuthenticationPrincipal UserDetails user*/ String username,
       @RequestBody CreateMovieDTO createMovieDto) {
     return movieMapper.entityToDto(
-        movieService.createMovie(userName, movieMapper.dtoToEntity(createMovieDto)));
+        movieService.createMovie(username, movieMapper.dtoToEntity(createMovieDto)));
   }
 
   @PostMapping("/{movieId}/vote")
   public void vote(
-      /*@AuthenticationPrincipal UserDetails user*/ String userName,
+      /*@AuthenticationPrincipal UserDetails user*/ String username,
       @PathVariable Long movieId,
       @RequestParam VoteType type) {
-    movieService.voteMovie(userName, movieId, type);
+    movieService.voteMovie(username, movieId, type);
   }
 }
