@@ -36,10 +36,7 @@ public class UserService {
     }
 
     User user =
-        User.builder()
-            .username(dto.username())
-            .password(dto.password()) // ⚠️ You’ll hash this once security is added
-            .build();
+        User.builder().username(dto.username()).password(dto.password()).email(dto.email()).build();
 
     userRepository.save(user);
     return userMapper.entityToDto(user);
