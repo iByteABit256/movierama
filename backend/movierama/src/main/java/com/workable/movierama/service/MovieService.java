@@ -1,5 +1,7 @@
 package com.workable.movierama.service;
 
+import com.workable.movierama.exception.MovieramaBaseException;
+import com.workable.movierama.exception.MovieramaNotFoundException;
 import com.workable.movierama.model.Movie;
 import com.workable.movierama.model.User;
 import com.workable.movierama.model.Vote;
@@ -35,7 +37,7 @@ public class MovieService {
     User user =
         userRepository
             .findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new MovieramaNotFoundException("User not found"));
     movie.setUser(user);
     movie.setDateAdded(LocalDateTime.now());
     return movieRepository.save(movie);
@@ -45,14 +47,14 @@ public class MovieService {
     User user =
         userRepository
             .findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new MovieramaNotFoundException("User not found"));
     Movie movie =
         movieRepository
             .findById(movieId)
-            .orElseThrow(() -> new RuntimeException("Movie not found"));
+            .orElseThrow(() -> new MovieramaNotFoundException("Movie not found"));
 
     if (movie.getUser().getId().equals(user.getId()))
-      throw new RuntimeException("You cannot vote on your own movie");
+      throw new MovieramaBaseException("You cannot vote on your own movie");
 
     voteRepository
         .findByUserIdAndMovieId(user.getId(), movieId)

@@ -3,6 +3,8 @@ package com.workable.movierama.service;
 import com.workable.movierama.dto.RegisterUserDTO;
 import com.workable.movierama.dto.UserDTO;
 import com.workable.movierama.dto.mappers.UserMapper;
+import com.workable.movierama.exception.MovieramaBaseException;
+import com.workable.movierama.exception.MovieramaNotFoundException;
 import com.workable.movierama.model.User;
 import com.workable.movierama.persistence.UserRepository;
 import java.util.List;
@@ -27,12 +29,12 @@ public class UserService {
     return userRepository
         .findById(id)
         .map(userMapper::entityToDto)
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new MovieramaNotFoundException("User not found"));
   }
 
   public UserDTO registerUser(RegisterUserDTO dto) {
     if (userRepository.findByUsername(dto.username()).isPresent()) {
-      throw new IllegalArgumentException("Username already exists");
+      throw new MovieramaBaseException("Username already exists");
     }
 
     User user =
