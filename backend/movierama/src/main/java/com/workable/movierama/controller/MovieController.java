@@ -7,7 +7,8 @@ import com.workable.movierama.model.VoteType;
 import com.workable.movierama.service.MovieService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/movies")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:9000")
 public class MovieController {
 
   private final MovieService movieService;
@@ -32,17 +32,16 @@ public class MovieController {
 
   @PostMapping
   public MovieDTO addMovie(
-      /*@AuthenticationPrincipal UserDetails user*/ String username,
-      @RequestBody CreateMovieDTO createMovieDto) {
+      @AuthenticationPrincipal UserDetails user, @RequestBody CreateMovieDTO createMovieDto) {
     return movieMapper.entityToDto(
-        movieService.createMovie(username, movieMapper.dtoToEntity(createMovieDto)));
+        movieService.createMovie(user.getUsername(), movieMapper.dtoToEntity(createMovieDto)));
   }
 
   @PostMapping("/{movieId}/vote")
   public void vote(
-      /*@AuthenticationPrincipal UserDetails user*/ String username,
+      @AuthenticationPrincipal UserDetails user,
       @PathVariable Long movieId,
       @RequestParam VoteType type) {
-    movieService.voteMovie(username, movieId, type);
+    movieService.voteMovie(user.getUsername(), movieId, type);
   }
 }
