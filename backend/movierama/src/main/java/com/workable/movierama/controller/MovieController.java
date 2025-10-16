@@ -33,18 +33,33 @@ public class MovieController {
     return ResponseEntity.ok(movies);
   }
 
+  @GetMapping("/user/{username}")
+  public ResponseEntity<Page<MovieDTO>> listMoviesByUsername(
+      @PathVariable String username, Pageable pageable) {
+    final Page<MovieDTO> movies =
+        movieService.getMoviesByUsername(username, pageable).map(movieMapper::entityToDto);
+    return ResponseEntity.ok(movies);
+  }
+
+  @GetMapping("/{movieId}")
+  public ResponseEntity<MovieDTO> getMovieById(@PathVariable Long movieId) {
+    return ResponseEntity.ok(movieMapper.entityToDto(movieService.getMovie(movieId)));
+  }
+
   @PostMapping
-  public MovieDTO addMovie(
+  public ResponseEntity<MovieDTO> addMovie(
       @AuthenticationPrincipal UserDetails user, @RequestBody CreateMovieDTO createMovieDto) {
-    return movieMapper.entityToDto(
-        movieService.createMovie(user.getUsername(), movieMapper.dtoToEntity(createMovieDto)));
+    return ResponseEntity.ok(
+        movieMapper.entityToDto(
+            movieService.createMovie(user.getUsername(), movieMapper.dtoToEntity(createMovieDto))));
   }
 
   @PostMapping("/{movieId}/vote")
-  public void vote(
+  public ResponseEntity<MovieDTO> vote(
       @AuthenticationPrincipal UserDetails user,
       @PathVariable Long movieId,
       @RequestParam VoteType type) {
-    movieService.voteMovie(user.getUsername(), movieId, type);
+    return ResponseEntity.ok(
+        movieMapper.entityToDto(movieService.voteMovie(user.getUsername(), movieId, type)));
   }
 }

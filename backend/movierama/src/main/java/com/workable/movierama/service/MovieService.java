@@ -27,8 +27,18 @@ public class MovieService {
     return movieRepository.findAll(pageable);
   }
 
+  public Page<Movie> getMoviesByUsername(String username, Pageable pageable) {
+    return movieRepository.findByUser_Username(username, pageable);
+  }
+
+  public Movie getMovie(Long movieId) {
+    return movieRepository
+        .findById(movieId)
+        .orElseThrow(() -> new MovieramaNotFoundException("Movie not found"));
+  }
+
   public Movie createMovie(String username, Movie movie) {
-    User user =
+    final User user =
         userRepository
             .findByUsername(username)
             .orElseThrow(() -> new MovieramaNotFoundException("User not found"));
@@ -37,12 +47,12 @@ public class MovieService {
     return movieRepository.save(movie);
   }
 
-  public void voteMovie(String username, Long movieId, VoteType type) {
-    User user =
+  public Movie voteMovie(String username, Long movieId, VoteType type) {
+    final User user =
         userRepository
             .findByUsername(username)
             .orElseThrow(() -> new MovieramaNotFoundException("User not found"));
-    Movie movie =
+    final Movie movie =
         movieRepository
             .findById(movieId)
             .orElseThrow(() -> new MovieramaNotFoundException("Movie not found"));
@@ -58,5 +68,7 @@ public class MovieService {
               else existing.setType(type);
             },
             () -> voteRepository.save(new Vote(null, movie, user, type)));
+
+    return movie;
   }
 }
