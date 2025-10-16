@@ -10,9 +10,9 @@ import com.workable.movierama.persistence.MovieRepository;
 import com.workable.movierama.persistence.UserRepository;
 import com.workable.movierama.persistence.VoteRepository;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,14 +23,8 @@ public class MovieService {
   private final UserRepository userRepository;
   private final VoteRepository voteRepository;
 
-  public List<Movie> getAllMovies(String sortBy) {
-    Sort sort =
-        switch (sortBy) {
-          case "likes" -> Sort.by(Sort.Direction.DESC, "likesCount");
-          case "hates" -> Sort.by(Sort.Direction.DESC, "hatesCount");
-          default -> Sort.by(Sort.Direction.DESC, "dateAdded");
-        };
-    return movieRepository.findAll(sort);
+  public Page<Movie> getAllMovies(Pageable pageable) {
+    return movieRepository.findAll(pageable);
   }
 
   public Movie createMovie(String username, Movie movie) {

@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 @Entity
 @Data
@@ -37,4 +38,10 @@ public class Movie {
 
   @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
   private List<Vote> votes;
+
+  @Formula("(SELECT COUNT(*) FROM votes v WHERE v.movie_id = id AND v.type = 'LIKE')")
+  private Long likeCount;
+
+  @Formula("(SELECT COUNT(*) FROM votes v WHERE v.movie_id = id AND v.type = 'HATE')")
+  private Long hateCount;
 }

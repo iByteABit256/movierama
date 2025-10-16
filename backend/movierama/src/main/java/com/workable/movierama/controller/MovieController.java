@@ -5,8 +5,10 @@ import com.workable.movierama.dto.MovieDTO;
 import com.workable.movierama.dto.mappers.MovieMapper;
 import com.workable.movierama.model.VoteType;
 import com.workable.movierama.service.MovieService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +28,9 @@ public class MovieController {
   private final MovieMapper movieMapper;
 
   @GetMapping
-  public List<MovieDTO> listMovies(@RequestParam(defaultValue = "date") String sortBy) {
-    return movieService.getAllMovies(sortBy).stream().map(movieMapper::entityToDto).toList();
+  public ResponseEntity<Page<MovieDTO>> listMovies(Pageable pageable) {
+    final Page<MovieDTO> movies = movieService.getAllMovies(pageable).map(movieMapper::entityToDto);
+    return ResponseEntity.ok(movies);
   }
 
   @PostMapping

@@ -26,5 +26,7 @@ public interface MovieMapper {
   @Mapping(target = "user", ignore = true)
   @Mapping(target = "dateAdded", expression = "java(java.time.LocalDateTime.now())")
   @Mapping(target = "votes", ignore = true)
+  @Mapping(target = "likeCount", ignore = true)
+  @Mapping(target = "hateCount", ignore = true)
   public Movie dtoToEntity(CreateMovieDTO movieDto);
 }
