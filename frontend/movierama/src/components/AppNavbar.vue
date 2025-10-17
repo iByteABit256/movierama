@@ -30,7 +30,7 @@
   margin-left: 1rem;
   text-decoration: none;
 }
-.links a.router-link-active {
-  text-decoration: underline;
+.links a:hover {
+  color: #f1ffe3;
 }
 </style>
