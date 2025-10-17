@@ -9,22 +9,22 @@
     </p>
 
     <div class="votes">
-      <button 
-        @click="vote('LIKE')" 
-        :class="{ 
+      <button
+        @click="vote('LIKE')"
+        :class="{
           active: userVote === 'LIKE',
-          disabled: moviesStore.loading 
+          disabled: moviesStore.loading,
         }"
         :disabled="moviesStore.loading"
       >
         <span v-if="userVote === 'LIKE'"></span>
         👍 {{ movie.likes }}
       </button>
-      <button 
-        @click="vote('HATE')" 
-        :class="{ 
+      <button
+        @click="vote('HATE')"
+        :class="{
           active: userVote === 'HATE',
-          disabled: moviesStore.loading 
+          disabled: moviesStore.loading,
         }"
         :disabled="moviesStore.loading"
       >
@@ -32,7 +32,7 @@
         👎 {{ movie.hates }}
       </button>
     </div>
-    
+
     <div v-if="moviesStore.error" class="error-message">
       {{ moviesStore.error }}
     </div>
@@ -46,8 +46,8 @@ import { useMoviesStore } from '../store/movies'
 const props = defineProps({
   movie: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const moviesStore = useMoviesStore()
@@ -60,7 +60,7 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   })
 }
 
@@ -80,7 +80,7 @@ const vote = async (type) => {
   padding: 16px;
   margin-bottom: 16px;
   background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .movie-card h3 {

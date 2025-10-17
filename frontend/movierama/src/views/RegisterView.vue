@@ -1,23 +1,23 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "../store/auth";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../store/auth'
 
-const router = useRouter();
-const authStore = useAuthStore();
+const router = useRouter()
+const authStore = useAuthStore()
 
-const username = ref("");
-const email = ref("");
-const password = ref("");
-const message = ref("");
+const username = ref('')
+const email = ref('')
+const password = ref('')
+const message = ref('')
 
 async function register() {
   try {
-    await authStore.register(username.value, email.value, password.value);
-    message.value = "Registration successful! You can now log in.";
-    setTimeout(() => router.push("/login"), 1000);
+    await authStore.register(username.value, email.value, password.value)
+    message.value = 'Registration successful! You can now log in.'
+    setTimeout(() => router.push('/login'), 1000)
   } catch {
-    message.value = "Failed to register.";
+    message.value = 'Failed to register.'
   }
 }
 </script>
