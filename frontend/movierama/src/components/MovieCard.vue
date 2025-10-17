@@ -13,9 +13,9 @@
         @click="vote('LIKE')"
         :class="{
           active: userVote === 'LIKE',
-          disabled: moviesStore.loading,
+          disabled: moviesStore.loading || isOwnMovie,
         }"
-        :disabled="moviesStore.loading"
+        :disabled="moviesStore.loading || isOwnMovie"
       >
         <span v-if="userVote === 'LIKE'"></span>
         👍 {{ movie.likes }}
@@ -24,9 +24,9 @@
         @click="vote('HATE')"
         :class="{
           active: userVote === 'HATE',
-          disabled: moviesStore.loading,
+          disabled: moviesStore.loading || isOwnMovie,
         }"
-        :disabled="moviesStore.loading"
+        :disabled="moviesStore.loading || isOwnMovie"
       >
         <span v-if="userVote === 'HATE'"></span>
         👎 {{ movie.hates }}
@@ -38,6 +38,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useMoviesStore } from '../store/movies'
+import { useAuthStore } from '../store/auth'
 
 const props = defineProps({
   movie: {
@@ -47,13 +48,18 @@ const props = defineProps({
 })
 
 const moviesStore = useMoviesStore()
+const authStore = useAuthStore()
 
 const userVote = computed(() => {
   return moviesStore.getUserVote(props.movie.id)
 })
 
+const isOwnMovie = computed(() => {
+  return authStore.currentUser?.username === props.movie.username
+})
+
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
+  return new Date(dateString).toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
