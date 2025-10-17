@@ -1,5 +1,9 @@
 <template>
   <div class="movies-page">
+    <div v-if="showError" class="error-message global-error" :class="{ fading: isFading }">
+      {{ moviesStore.error }}
+    </div>
+
     <h1>All Movies</h1>
 
     <div class="pagination-controls">
@@ -84,10 +88,6 @@
         </div>
       </div>
     </div>
-
-    <div v-if="moviesStore.error" class="error-message">
-      {{ moviesStore.error }}
-    </div>
   </div>
 </template>
 
@@ -99,6 +99,8 @@ import MovieCard from '../components/MovieCard.vue'
 const moviesStore = useMoviesStore()
 const movies = ref([])
 const pageSize = ref(10)
+const showError = ref(false)
+const isFading = ref(false)
 
 const showingStart = computed(() => {
   return moviesStore.currentPage * moviesStore.pageSize + 1
@@ -174,6 +176,28 @@ const goToLastPage = async () => {
   movies.value = moviesStore.movies
 }
 
+watch(
+  () => moviesStore.error,
+  (newError) => {
+    if (newError) {
+      showError.value = true
+      isFading.value = false
+
+      setTimeout(() => {
+        isFading.value = true
+
+        setTimeout(() => {
+          showError.value = false
+          moviesStore.clearError()
+        }, 300)
+      }, 2000)
+    } else {
+      showError.value = false
+      isFading.value = false
+    }
+  },
+)
+
 onMounted(() => {
   loadMovies()
 })
@@ -195,5 +219,24 @@ watch(
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+}
+
+.sticky-error {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  margin: -20px -20px 20px -20px;
+  border-radius: 0;
+  text-align: center;
+  padding: 16px 20px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border-bottom: 1px solid #f5c6cb;
+  transition: all 0.3s ease;
+}
+
+.sticky-error.fading {
+  opacity: 0;
+  transform: translateY(-100%);
 }
 </style>
