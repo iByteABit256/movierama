@@ -32,10 +32,6 @@
         👎 {{ movie.hates }}
       </button>
     </div>
-
-    <div v-if="moviesStore.error" class="error-message">
-      {{ moviesStore.error }}
-    </div>
   </div>
 </template>
 
