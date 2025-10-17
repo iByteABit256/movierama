@@ -1,33 +1,48 @@
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "../store/auth";
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+const username = ref("");
+const email = ref("");
+const password = ref("");
+const message = ref("");
+
+async function register() {
+  try {
+    await authStore.register(username.value, email.value, password.value);
+    message.value = "Registration successful! You can now log in.";
+    setTimeout(() => router.push("/login"), 1000);
+  } catch {
+    message.value = "Failed to register.";
+  }
+}
+</script>
+
 <template>
   <div class="form-container">
-    <h2>Create an Account</h2>
+    <h2>Register</h2>
     <form @submit.prevent="register">
       <div class="form-group">
         <label>Username</label>
-        <input v-model="username" placeholder="Choose a username" required />
+        <input v-model="username" required />
       </div>
       <div class="form-group">
         <label>Email</label>
-        <input type="email" v-model="email" placeholder="Your email address" required />
+        <input type="email" v-model="email" required />
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" v-model="password" placeholder="Create a password" required />
+        <input type="password" v-model="password" required />
       </div>
-      <button type="submit">Register</button>
+      <button type="submit">Sign Up</button>
+      <p>{{ message }}</p>
     </form>
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-const username = ref('')
-const email = ref('')
-const password = ref('')
-function register() {
-  alert(`Registered as ${username.value}`)
-}
-</script>
 
 <style scoped>
 @import '../styles/form.css';

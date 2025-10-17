@@ -5,45 +5,164 @@
     <p class="meta">
       Posted by
       <router-link :to="`/user/${movie.username}`">{{ movie.username }}</router-link>
-      on {{ new Date(movie.dateAdded).toLocaleDateString() }}
+      on {{ formatDate(movie.dateAdded) }}
     </p>
 
     <div class="votes">
-      <button>👍 {{ movie.likes }}</button>
-      <button>👎 {{ movie.hates }}</button>
+      <button 
+        @click="vote('LIKE')" 
+        :class="{ 
+          active: userVote === 'LIKE',
+          disabled: moviesStore.loading 
+        }"
+        :disabled="moviesStore.loading"
+      >
+        <span v-if="userVote === 'LIKE'"></span>
+        👍 {{ movie.likes }}
+      </button>
+      <button 
+        @click="vote('HATE')" 
+        :class="{ 
+          active: userVote === 'HATE',
+          disabled: moviesStore.loading 
+        }"
+        :disabled="moviesStore.loading"
+      >
+        <span v-if="userVote === 'HATE'"></span>
+        👎 {{ movie.hates }}
+      </button>
+    </div>
+    
+    <div v-if="moviesStore.error" class="error-message">
+      {{ moviesStore.error }}
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+import { useMoviesStore } from '../store/movies'
+
+const props = defineProps({
   movie: {
     type: Object,
-    required: true,
-  },
+    required: true
+  }
 })
+
+const moviesStore = useMoviesStore()
+
+const userVote = computed(() => {
+  return moviesStore.getUserVote(props.movie.id)
+})
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
+const vote = async (type) => {
+  try {
+    await moviesStore.vote(props.movie.id, type)
+  } catch (error) {
+    console.error('Vote failed:', error)
+  }
+}
 </script>
 
 <style scoped>
 .movie-card {
   border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 10px;
-  margin-bottom: 1rem;
-  background: #fafafa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.meta {
+
+.movie-card h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 1.25em;
+}
+
+.movie-card p {
+  margin: 0 0 8px 0;
   color: #666;
-  font-size: 0.9rem;
+  line-height: 1.5;
 }
+
+.meta {
+  font-size: 0.9em;
+  color: #888;
+}
+
+.meta a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.meta a:hover {
+  text-decoration: underline;
+}
+
+.votes {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
 .votes button {
-  margin-right: 0.5rem;
-  background: #eee;
-  border: none;
-  padding: 0.3rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  background: white;
   cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
 }
-.votes button:hover {
-  background: #ddd;
+
+.votes button:hover:not(:disabled) {
+  border-color: #007bff;
+  transform: translateY(-1px);
+}
+
+.votes button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.votes button.active:hover:not(:disabled) {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.votes button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.votes button.disabled {
+  opacity: 0.6;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.9em;
+  margin-top: 8px;
+  padding: 8px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
 }
 </style>
