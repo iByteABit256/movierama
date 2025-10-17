@@ -4,10 +4,10 @@
     <form @submit.prevent="submit">
       <div class="form-group">
         <label>Title</label>
-        <input 
-          v-model="title" 
-          placeholder="Enter movie title" 
-          required 
+        <input
+          v-model="title"
+          placeholder="Enter movie title"
+          required
           :disabled="moviesStore.loading"
         />
       </div>
@@ -21,15 +21,15 @@
           :disabled="moviesStore.loading"
         ></textarea>
       </div>
-      
+
       <div v-if="moviesStore.error" class="error-message">
         {{ moviesStore.error }}
       </div>
-      
+
       <div v-if="successMessage" class="success-message">
         {{ successMessage }}
       </div>
-      
+
       <button type="submit" :disabled="moviesStore.loading || !title || !description">
         {{ moviesStore.loading ? 'Adding...' : 'Add Movie' }}
       </button>
@@ -48,13 +48,13 @@ const successMessage = ref('')
 
 const submit = async () => {
   successMessage.value = ''
-  
+
   try {
     await moviesStore.addMovie(title.value, description.value)
     successMessage.value = 'Movie added successfully!'
     title.value = ''
     description.value = ''
-    
+
     // Clear success message after 3 seconds
     setTimeout(() => {
       successMessage.value = ''
@@ -66,5 +66,5 @@ const submit = async () => {
 </script>
 
 <style scoped>
-  @import '../styles/form.css';
+@import '../styles/form.css';
 </style>

@@ -101,7 +101,8 @@
 }
 
 /* Status Messages */
-.loading, .no-movies {
+.loading,
+.no-movies {
   text-align: center;
   padding: 40px;
   color: #666;
@@ -132,12 +133,12 @@
   .pagination-controls {
     justify-content: center;
   }
-  
+
   .pagination-buttons {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .page-numbers {
     order: -1;
     margin: 0;

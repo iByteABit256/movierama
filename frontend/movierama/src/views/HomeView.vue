@@ -1,12 +1,12 @@
 <template>
   <div class="movies-page">
     <h1>All Movies</h1>
-    
+
     <div class="pagination-controls">
       <label for="pageSize">Movies per page:</label>
-      <select 
-        id="pageSize" 
-        v-model="pageSize" 
+      <select
+        id="pageSize"
+        v-model="pageSize"
         @change="onPageSizeChange"
         :disabled="moviesStore.loading"
       >
@@ -16,47 +16,41 @@
         <option value="50">50</option>
       </select>
     </div>
-    
-    <div v-if="moviesStore.loading" class="loading">
-      Loading movies...
-    </div>
-    
+
+    <div v-if="moviesStore.loading" class="loading">Loading movies...</div>
+
     <div v-else-if="movies.length === 0" class="no-movies">
       No movies found. Be the first to add one!
     </div>
-    
+
     <div v-else>
       <div class="movies-list">
-        <MovieCard 
-          v-for="movie in movies" 
-          :key="movie.id" 
-          :movie="movie" 
-        />
+        <MovieCard v-for="movie in movies" :key="movie.id" :movie="movie" />
       </div>
-      
+
       <!-- Pagination -->
       <div class="pagination">
         <div class="pagination-info">
           Showing {{ showingStart }}-{{ showingEnd }} of {{ moviesStore.totalElements }} movies
           (Page {{ moviesStore.currentPage + 1 }} of {{ moviesStore.totalPages }})
         </div>
-        
+
         <div class="pagination-buttons">
-          <button 
+          <button
             @click="goToFirstPage"
             :disabled="!moviesStore.hasPrevPage || moviesStore.loading"
             class="pagination-btn"
           >
             ⏮ First
           </button>
-          <button 
+          <button
             @click="prevPage"
             :disabled="!moviesStore.hasPrevPage || moviesStore.loading"
             class="pagination-btn"
           >
             ◀ Previous
           </button>
-          
+
           <div class="page-numbers">
             <button
               v-for="page in visiblePages"
@@ -64,7 +58,7 @@
               @click="goToPage(page - 1)"
               :class="{
                 'pagination-btn': true,
-                'active': page - 1 === moviesStore.currentPage
+                active: page - 1 === moviesStore.currentPage,
               }"
               :disabled="moviesStore.loading"
             >
@@ -72,15 +66,15 @@
             </button>
             <span v-if="showEllipsis" class="ellipsis">...</span>
           </div>
-          
-          <button 
+
+          <button
             @click="nextPage"
             :disabled="!moviesStore.hasNextPage || moviesStore.loading"
             class="pagination-btn"
           >
             Next ▶
           </button>
-          <button 
+          <button
             @click="goToLastPage"
             :disabled="!moviesStore.hasNextPage || moviesStore.loading"
             class="pagination-btn"
@@ -90,7 +84,7 @@
         </div>
       </div>
     </div>
-    
+
     <div v-if="moviesStore.error" class="error-message">
       {{ moviesStore.error }}
     </div>
@@ -107,7 +101,7 @@ const movies = ref([])
 const pageSize = ref(10)
 
 const showingStart = computed(() => {
-  return (moviesStore.currentPage * moviesStore.pageSize) + 1
+  return moviesStore.currentPage * moviesStore.pageSize + 1
 })
 
 const showingEnd = computed(() => {
@@ -119,20 +113,20 @@ const visiblePages = computed(() => {
   const current = moviesStore.currentPage
   const total = moviesStore.totalPages
   const pages = []
-  
+
   // Show max 5 pages around current page
   let start = Math.max(0, current - 2)
   let end = Math.min(total, start + 5)
-  
+
   // Adjust start if we're near the end
   if (end - start < 5) {
     start = Math.max(0, end - 5)
   }
-  
+
   for (let i = start; i < end; i++) {
     pages.push(i + 1)
   }
-  
+
   return pages
 })
 
@@ -185,9 +179,12 @@ onMounted(() => {
 })
 
 // Watch for page size changes in store
-watch(() => moviesStore.pageSize, (newSize) => {
-  pageSize.value = newSize
-})
+watch(
+  () => moviesStore.pageSize,
+  (newSize) => {
+    pageSize.value = newSize
+  },
+)
 </script>
 
 <style scoped>
