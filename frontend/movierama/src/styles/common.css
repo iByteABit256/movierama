@@ -1,0 +1,79 @@
+/* Movie Card Styles */
+.movie-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.movie-card h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 1.25em;
+}
+
+.movie-card p {
+  margin: 0 0 8px 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.meta {
+  font-size: 0.9em;
+  color: #888;
+}
+
+.meta a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.meta a:hover {
+  text-decoration: underline;
+}
+
+/* Votes Styles */
+.votes {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.votes button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.votes button:hover:not(:disabled) {
+  border-color: #007bff;
+  transform: translateY(-1px);
+}
+
+.votes button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.votes button.active:hover:not(:disabled) {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.votes button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

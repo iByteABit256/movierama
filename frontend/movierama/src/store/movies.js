@@ -9,12 +9,33 @@ export const useMoviesStore = defineStore("movies", {
     userVotes: new Map(),
     sort: "dateAdded,desc",
     loading: false,
-    error: null
+    error: null,
+    // Pagination state
+    currentPage: 0,
+    pageSize: 10,
+    totalPages: 0,
+    totalElements: 0,
+    // User movies pagination
+    userCurrentPage: 0,
+    userTotalPages: 0,
+    userTotalElements: 0
   }),
 
   getters: {
     getUserVote: (state) => (movieId) => {
       return state.userVotes.get(movieId) || null;
+    },
+    hasNextPage: (state) => {
+      return state.currentPage < state.totalPages - 1;
+    },
+    hasPrevPage: (state) => {
+      return state.currentPage > 0;
+    },
+    hasNextUserPage: (state) => {
+      return state.userCurrentPage < state.userTotalPages - 1;
+    },
+    hasPrevUserPage: (state) => {
+      return state.userCurrentPage > 0;
     }
   },
 
@@ -31,6 +52,10 @@ export const useMoviesStore = defineStore("movies", {
           }
         });
         this.movies = data.content || [];
+        this.currentPage = data.number || 0;
+        this.totalPages = data.totalPages || 0;
+        this.totalElements = data.totalElements || 0;
+        this.pageSize = data.size || size;
         
         // Fetch user votes for the visible movies
         if (this.movies.length > 0) {
@@ -77,6 +102,9 @@ export const useMoviesStore = defineStore("movies", {
           }
         });
         this.userMovies = data.content || [];
+        this.userCurrentPage = data.number || 0;
+        this.userTotalPages = data.totalPages || 0;
+        this.userTotalElements = data.totalElements || 0;
         
         // Fetch user votes for the visible user movies
         if (this.userMovies.length > 0) {
@@ -159,6 +187,50 @@ export const useMoviesStore = defineStore("movies", {
       } finally {
         this.loading = false;
       }
+    },
+
+    // Pagination actions
+    async nextPage() {
+      if (this.hasNextPage) {
+        await this.fetchMovies(this.currentPage + 1, this.pageSize);
+      }
+    },
+
+    async prevPage() {
+      if (this.hasPrevPage) {
+        await this.fetchMovies(this.currentPage - 1, this.pageSize);
+      }
+    },
+
+    async goToPage(page) {
+      if (page >= 0 && page < this.totalPages) {
+        await this.fetchMovies(page, this.pageSize);
+      }
+    },
+
+    async nextUserPage(username) {
+      if (this.hasNextUserPage) {
+        await this.fetchMoviesByUser(username, this.userCurrentPage + 1, this.pageSize);
+      }
+    },
+
+    async prevUserPage(username) {
+      if (this.hasPrevUserPage) {
+        await this.fetchMoviesByUser(username, this.userCurrentPage - 1, this.pageSize);
+      }
+    },
+
+    async goToUserPage(username, page) {
+      if (page >= 0 && page < this.userTotalPages) {
+        await this.fetchMoviesByUser(username, page, this.pageSize);
+      }
+    },
+
+    setPageSize(size) {
+      this.pageSize = size;
+      // Reset to first page when changing page size
+      this.currentPage = 0;
+      this.userCurrentPage = 0;
     },
 
     clearError() {
