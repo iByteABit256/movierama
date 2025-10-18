@@ -1,5 +1,12 @@
 package com.workable.movierama.service;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.workable.movierama.exception.MovieramaBaseException;
 import com.workable.movierama.exception.MovieramaNotFoundException;
 import com.workable.movierama.model.Movie;
@@ -9,12 +16,8 @@ import com.workable.movierama.model.VoteType;
 import com.workable.movierama.persistence.MovieRepository;
 import com.workable.movierama.persistence.UserRepository;
 import com.workable.movierama.persistence.VoteRepository;
-import java.time.LocalDateTime;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
