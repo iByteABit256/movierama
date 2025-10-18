@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
+
+    // Ignore auth cookie on user change or registration
+    if (request.getRequestURI().contains("api/v1/auth")
+        && request.getMethod().equals(HttpMethod.POST.name())) {
+      filterChain.doFilter(request, response);
+      return;
+    }
 
     final String authHeader = request.getHeader("Authorization");
     final String jwt;
