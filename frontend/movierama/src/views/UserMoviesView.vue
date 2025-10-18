@@ -2,6 +2,30 @@
   <div class="user-movies">
     <h1>Movies by {{ username }}</h1>
 
+    <div class="sort-controls">
+      <label for="sortField">Sort by:</label>
+      <select
+        id="sortField"
+        v-model="sortField"
+        @change="onSortChange"
+        :disabled="moviesStore.loading"
+      >
+        <option value="likeCount">Likes</option>
+        <option value="hateCount">Hates</option>
+        <option value="dateAdded">Date Added</option>
+      </select>
+
+      <select
+        id="sortDir"
+        v-model="sortDirection"
+        @change="onSortChange"
+        :disabled="moviesStore.loading"
+      >
+        <option value="desc">Descending</option>
+        <option value="asc">Ascending</option>
+      </select>
+    </div>
+
     <div class="pagination-controls">
       <label for="userPageSize">Movies per page:</label>
       <select
@@ -100,6 +124,8 @@ const moviesStore = useMoviesStore()
 const username = ref(route.params.username)
 const movies = ref([])
 const pageSize = ref(10)
+const sortField = ref(moviesStore.sort.split(',')[0] || 'dateAdded')
+const sortDirection = ref(moviesStore.sort.split(',')[1] || 'desc')
 
 const showingStart = computed(() => {
   return moviesStore.userCurrentPage * moviesStore.pageSize + 1
@@ -134,6 +160,11 @@ const visiblePages = computed(() => {
 const showEllipsis = computed(() => {
   return moviesStore.userTotalPages > visiblePages.value.length
 })
+
+const onSortChange = () => {
+  moviesStore.sort = `${sortField.value},${sortDirection.value}`
+  loadUserMovies()
+}
 
 const onPageSizeChange = () => {
   moviesStore.setPageSize(parseInt(pageSize.value))

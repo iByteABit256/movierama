@@ -6,6 +6,30 @@
 
     <h1>All Movies</h1>
 
+    <div class="sort-controls">
+      <label for="sortField">Sort by:</label>
+      <select
+        id="sortField"
+        v-model="sortField"
+        @change="onSortChange"
+        :disabled="moviesStore.loading"
+      >
+        <option value="likeCount">Likes</option>
+        <option value="hateCount">Hates</option>
+        <option value="dateAdded">Date Added</option>
+      </select>
+
+      <select
+        id="sortDir"
+        v-model="sortDirection"
+        @change="onSortChange"
+        :disabled="moviesStore.loading"
+      >
+        <option value="desc">Descending</option>
+        <option value="asc">Ascending</option>
+      </select>
+    </div>
+
     <div class="pagination-controls">
       <label for="pageSize">Movies per page:</label>
       <select
@@ -99,6 +123,8 @@ import MovieCard from '../components/MovieCard.vue'
 const moviesStore = useMoviesStore()
 const movies = ref([])
 const pageSize = ref(10)
+const sortField = ref(moviesStore.sort.split(',')[0] || 'dateAdded')
+const sortDirection = ref(moviesStore.sort.split(',')[1] || 'desc')
 const showError = ref(false)
 const isFading = ref(false)
 
@@ -135,6 +161,11 @@ const visiblePages = computed(() => {
 const showEllipsis = computed(() => {
   return moviesStore.totalPages > visiblePages.value.length
 })
+
+const onSortChange = () => {
+  moviesStore.sort = `${sortField.value},${sortDirection.value}`
+  loadMovies()
+}
 
 const onPageSizeChange = () => {
   moviesStore.setPageSize(parseInt(pageSize.value))

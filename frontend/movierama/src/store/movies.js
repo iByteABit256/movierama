@@ -37,6 +37,9 @@ export const useMoviesStore = defineStore('movies', {
     hasPrevUserPage: (state) => {
       return state.userCurrentPage > 0
     },
+    sortParam: (state) => {
+      return `${state.sort}`
+    },
   },
 
   actions: {
