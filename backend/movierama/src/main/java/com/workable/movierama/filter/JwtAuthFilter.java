@@ -31,11 +31,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
 
-     // Ignore auth cookie on user change or registration
-     if (request.getRequestURI().contains("api/v1/auth") && request.getMethod().equals(HttpMethod.POST.name())) {
-       filterChain.doFilter(request, response);
-       return;
-     }
+    // Ignore auth cookie on user change or registration
+    if (request.getRequestURI().contains("api/v1/auth")
+        && request.getMethod().equals(HttpMethod.POST.name())) {
+      filterChain.doFilter(request, response);
+      return;
+    }
 
     final String authHeader = request.getHeader("Authorization");
     final String jwt;
