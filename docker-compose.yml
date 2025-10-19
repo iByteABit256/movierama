@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: movierama-postgres
+    environment:
+      POSTGRES_DB: movierama
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - movierama-network
+
+  backend:
+    build:
+      context: ./backend/movierama
+    container_name: movierama-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movierama
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres
+    ports:
+      - "9000:9000"
+    networks:
+      - movierama-network
+
+  frontend:
+    build:
+      context: ./frontend/movierama
+    container_name: movierama-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    networks:
+      - movierama-network
+
+volumes:
+  postgres_data:
+
+networks:
+  movierama-network:
+    driver: bridge
