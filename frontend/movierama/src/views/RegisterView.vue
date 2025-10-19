@@ -14,8 +14,7 @@ const message = ref('')
 async function register() {
   try {
     await authStore.register(username.value, email.value, password.value)
-    message.value = 'Registration successful! You can now log in.'
-    setTimeout(() => router.push('/login'), 1000)
+    router.push('/')
   } catch {
     message.value = 'Failed to register.'
   }
