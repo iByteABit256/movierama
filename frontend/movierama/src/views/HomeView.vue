@@ -47,13 +47,13 @@
 
     <div v-if="moviesStore.loading" class="loading">Loading movies...</div>
 
-    <div v-else-if="movies.length === 0" class="no-movies">
+    <div v-else-if="moviesStore.movies.length === 0" class="no-movies">
       No movies found. Be the first to add one!
     </div>
 
     <div v-else>
       <div class="movies-list">
-        <MovieCard v-for="movie in movies" :key="movie.id" :movie="movie" />
+        <MovieCard v-for="movie in moviesStore.movies" :key="movie.id" :movie="movie" />
       </div>
 
       <!-- Pagination -->
@@ -121,7 +121,6 @@ import { useMoviesStore } from '../store/movies'
 import MovieCard from '../components/MovieCard.vue'
 
 const moviesStore = useMoviesStore()
-const movies = ref([])
 const pageSize = ref(10)
 const sortField = ref(moviesStore.sort.split(',')[0] || 'dateAdded')
 const sortDirection = ref(moviesStore.sort.split(',')[1] || 'desc')
@@ -172,39 +171,24 @@ const onPageSizeChange = () => {
   loadMovies()
 }
 
-const loadMovies = async () => {
-  try {
-    const data = await moviesStore.fetchMovies(moviesStore.currentPage, moviesStore.pageSize)
-    movies.value = data.content || []
-  } catch (error) {
-    console.error('Failed to load movies:', error)
-    movies.value = []
-  }
-}
-
 const nextPage = async () => {
   await moviesStore.nextPage()
-  movies.value = moviesStore.movies
 }
 
 const prevPage = async () => {
   await moviesStore.prevPage()
-  movies.value = moviesStore.movies
 }
 
 const goToPage = async (page) => {
   await moviesStore.goToPage(page)
-  movies.value = moviesStore.movies
 }
 
 const goToFirstPage = async () => {
   await moviesStore.goToPage(0)
-  movies.value = moviesStore.movies
 }
 
 const goToLastPage = async () => {
   await moviesStore.goToPage(moviesStore.totalPages - 1)
-  movies.value = moviesStore.movies
 }
 
 watch(
@@ -229,10 +213,6 @@ watch(
   },
 )
 
-onMounted(() => {
-  loadMovies()
-})
-
 // Watch for page size changes in store
 watch(
   () => moviesStore.pageSize,
@@ -240,6 +220,18 @@ watch(
     pageSize.value = newSize
   },
 )
+
+const loadMovies = async () => {
+  try {
+    await moviesStore.fetchMovies(moviesStore.currentPage, moviesStore.pageSize)
+  } catch (error) {
+    console.error('Failed to load movies:', error)
+  }
+}
+
+onMounted(() => {
+  loadMovies()
+})
 </script>
 
 <style scoped>

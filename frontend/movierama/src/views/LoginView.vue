@@ -14,7 +14,7 @@ async function login() {
   try {
     await authStore.login(username.value, password.value)
     router.push('/')
-  } catch (e) {
+  } catch {
     error.value = 'Invalid username or password'
   }
 }

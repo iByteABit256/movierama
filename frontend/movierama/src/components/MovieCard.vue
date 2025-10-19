@@ -10,6 +10,7 @@
 
     <div class="votes">
       <button
+        type="button"
         @click="vote('LIKE')"
         :class="{
           active: userVote === 'LIKE',
@@ -21,6 +22,7 @@
         👍 {{ movie.likes }}
       </button>
       <button
+        type="button"
         @click="vote('HATE')"
         :class="{
           active: userVote === 'HATE',

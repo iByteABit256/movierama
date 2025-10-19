@@ -43,11 +43,13 @@
 
     <div v-if="moviesStore.loading" class="loading">Loading movies...</div>
 
-    <div v-else-if="movies.length === 0" class="no-movies">No movies found for this user.</div>
+    <div v-else-if="moviesStore.movies.length === 0" class="no-movies">
+      No movies found for this user.
+    </div>
 
     <div v-else>
       <div class="movies-list">
-        <MovieCard v-for="movie in movies" :key="movie.id" :movie="movie" />
+        <MovieCard v-for="movie in moviesStore.movies" :key="movie.id" :movie="movie" />
       </div>
 
       <!-- Pagination -->
@@ -122,7 +124,6 @@ import MovieCard from '../components/MovieCard.vue'
 const route = useRoute()
 const moviesStore = useMoviesStore()
 const username = ref(route.params.username)
-const movies = ref([])
 const pageSize = ref(10)
 const sortField = ref(moviesStore.sort.split(',')[0] || 'dateAdded')
 const sortDirection = ref(moviesStore.sort.split(',')[1] || 'desc')
@@ -171,43 +172,36 @@ const onPageSizeChange = () => {
   loadUserMovies()
 }
 
-const loadUserMovies = async () => {
-  try {
-    const data = await moviesStore.fetchMoviesByUser(
-      username.value,
-      moviesStore.userCurrentPage,
-      moviesStore.pageSize,
-    )
-    movies.value = data.content || []
-  } catch (error) {
-    console.error('Failed to load user movies:', error)
-    movies.value = []
-  }
-}
-
 const nextPage = async () => {
   await moviesStore.nextUserPage(username.value)
-  movies.value = moviesStore.userMovies
 }
 
 const prevPage = async () => {
   await moviesStore.prevUserPage(username.value)
-  movies.value = moviesStore.userMovies
 }
 
 const goToPage = async (page) => {
   await moviesStore.goToUserPage(username.value, page)
-  movies.value = moviesStore.userMovies
 }
 
 const goToFirstPage = async () => {
   await moviesStore.goToUserPage(username.value, 0)
-  movies.value = moviesStore.userMovies
 }
 
 const goToLastPage = async () => {
   await moviesStore.goToUserPage(username.value, moviesStore.userTotalPages - 1)
-  movies.value = moviesStore.userMovies
+}
+
+const loadUserMovies = async () => {
+  try {
+    await moviesStore.fetchMoviesByUser(
+      username.value,
+      moviesStore.userCurrentPage,
+      moviesStore.pageSize,
+    )
+  } catch (error) {
+    console.error('Failed to load user movies:', error)
+  }
 }
 
 onMounted(() => {
