@@ -1,27 +1,35 @@
 package com.workable.movierama.service.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
 
-  private static final String SECRET =
-      "your-super-secret-jwt-key-that-should-be-very-long"; // TODO: move to env variable
-  private static final long EXPIRATION_MS = 24 * 60 * 60 * 1000; // 24 hours TODO: make configurable
+  private final String secret;
+  private final long expirationMs;
+
+  public JwtService(
+      @Value("${jwt.secret}") String secret, @Value("${jwt.expiration-ms}") long expirationMs) {
+    this.secret = secret;
+    this.expirationMs = expirationMs;
+  }
 
   private Key getSigningKey() {
-    return Keys.hmacShaKeyFor(SECRET.getBytes());
+    return Keys.hmacShaKeyFor(secret.getBytes());
   }
 
   public String generateToken(String username) {
     return Jwts.builder()
         .setSubject(username)
         .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
+        .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
         .signWith(getSigningKey(), SignatureAlgorithm.HS256)
         .compact();
   }

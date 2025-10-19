@@ -37,7 +37,7 @@ public class UserService {
       throw new MovieramaBaseException("Username already exists");
     }
 
-    User user =
+    final User user =
         User.builder().username(dto.username()).password(dto.password()).email(dto.email()).build();
 
     userRepository.save(user);
