@@ -113,3 +113,13 @@
   background: #d4edda;
   border: 1px solid #c3e6cb;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}

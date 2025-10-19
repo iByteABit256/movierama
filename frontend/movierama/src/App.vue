@@ -33,23 +33,4 @@ body {
   flex: 1;
   padding: 1.5rem;
 }
-
-.error-message {
-  color: #dc3545;
-  text-align: center;
-  padding: 20px;
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  margin-top: 20px;
-}
-
-.success-message {
-  color: #155724;
-  margin-bottom: 15px;
-  padding: 10px;
-  background: #d4edda;
-  border: 1px solid #c3e6cb;
-  border-radius: 4px;
-}
 </style>

@@ -159,14 +159,4 @@ const vote = async (type) => {
 .votes button.disabled {
   opacity: 0.6;
 }
-
-.error-message {
-  color: #dc3545;
-  font-size: 0.9em;
-  margin-top: 8px;
-  padding: 8px;
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-}
 </style>

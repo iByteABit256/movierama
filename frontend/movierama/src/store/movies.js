@@ -171,26 +171,16 @@ export const useMoviesStore = defineStore('movies', {
         // Update user's vote
         this.userVotes.set(movieId, type)
 
-        // Update movie in-place (preferred)
         const updateMovieInArray = (array) => {
           const movie = array.find((m) => m.id === movieId)
           if (movie) {
             // copy all returned fields into existing object
             Object.assign(movie, data)
-            return true
           }
-          return false
         }
 
-        // try updating in-place, if not found use splice to replace preserving array identity
-        if (!updateMovieInArray(this.movies)) {
-          const idx = this.movies.findIndex((m) => m.id === movieId)
-          if (idx !== -1) this.movies.splice(idx, 1, data)
-        }
-        if (!updateMovieInArray(this.userMovies)) {
-          const idxU = this.userMovies.findIndex((m) => m.id === movieId)
-          if (idxU !== -1) this.userMovies.splice(idxU, 1, data)
-        }
+        updateMovieInArray(this.movies)
+        updateMovieInArray(this.userMovies)
 
         if (this.currentMovie?.id === movieId) {
           Object.assign(this.currentMovie, data)
