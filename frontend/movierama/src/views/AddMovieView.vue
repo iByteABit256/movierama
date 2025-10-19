@@ -67,4 +67,5 @@ const submit = async () => {
 
 <style scoped>
 @import '../styles/form.css';
+@import '../styles/common.css';
 </style>

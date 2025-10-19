@@ -153,7 +153,7 @@ export const useMoviesStore = defineStore('movies', {
         this.movies.unshift(data)
         return data
       } catch (error) {
-        this.error = error.response?.data?.message || 'Failed to add movie'
+        this.error = error.response?.data?.message || 'Failed to add movie. Are you logged in?'
         throw error
       } finally {
         this.loading = false
@@ -198,7 +198,7 @@ export const useMoviesStore = defineStore('movies', {
 
         return data
       } catch (error) {
-        this.error = error.response?.data?.message || 'Failed to vote'
+        this.error = error.response?.data?.message || 'Failed to vote. Are you logged in?'
         throw error
       } finally {
         this.voting = false

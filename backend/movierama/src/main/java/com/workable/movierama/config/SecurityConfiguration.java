@@ -39,9 +39,10 @@ public class SecurityConfiguration {
                         "/v3/api-docs",
                         "/v3/api-docs/**",
                         "/v3/api-docs.yaml",
-                        "/api-docs/**")
-                    .permitAll()
-                    .requestMatchers("/api/v1/auth/**")
+                        "/api-docs/**",
+                        "/api/v1/auth/**",
+                        "/api/v1/movies",
+                        "/api/v1/movies/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
