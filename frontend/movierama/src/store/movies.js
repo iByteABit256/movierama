@@ -234,9 +234,13 @@ export const useMoviesStore = defineStore('movies', {
 
     setPageSize(size) {
       this.pageSize = size
-      // Reset to first page when changing page size
+      // Reset both pagination states when changing page size
       this.currentPage = 0
       this.userCurrentPage = 0
+
+      // Clear the current movies since we're changing page size
+      this.movies = []
+      this.userMovies = []
     },
 
     clearError() {

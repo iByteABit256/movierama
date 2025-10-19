@@ -136,7 +136,11 @@ const props = defineProps({
 })
 
 const moviesStore = useMoviesStore()
-const pageSize = ref(10)
+const pageSize = computed({
+  get: () => moviesStore.pageSize,
+  set: (value) => moviesStore.setPageSize(parseInt(value)),
+})
+
 const sortField = ref(moviesStore.sort.split(',')[0] || 'dateAdded')
 const sortDirection = ref(moviesStore.sort.split(',')[1] || 'desc')
 
@@ -208,7 +212,6 @@ const onSortChange = () => {
 }
 
 const onPageSizeChange = () => {
-  moviesStore.setPageSize(parseInt(pageSize.value))
   loadMovies()
 }
 
@@ -249,13 +252,6 @@ watch(
   () => {
     moviesStore.clearUserVotes()
     loadMovies()
-  },
-)
-
-watch(
-  () => moviesStore.pageSize,
-  (newSize) => {
-    pageSize.value = newSize
   },
 )
 </script>
