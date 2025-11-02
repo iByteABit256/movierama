@@ -1,1 +1,0 @@
-impl std::future::Future<Output = axum::Json<models::Movie>>: axum::handler::Handler<_, sqlx::Pool<sqlx::Postgres>>

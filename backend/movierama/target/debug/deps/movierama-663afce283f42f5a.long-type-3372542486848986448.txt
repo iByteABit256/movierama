@@ -1,2 +1,0 @@
-fn({type error}, axum::extract::Path<i64>) -> impl std::future::Future<Output = axum::Json<std::string::String>> {handlers::movies_handler::unvote_movie}
-fn({type error}, axum::extract::Path<i64>) -> impl std::future::Future<Output = axum::Json<std::string::String>> {handlers::movies_handler::unvote_movie}: axum::handler::Handler<_, _>
