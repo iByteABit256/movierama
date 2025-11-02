@@ -1,0 +1,2 @@
+fn(State<Pool<Postgres>>, axum::Json<NewMovie>, Extension<i32>) -> impl std::future::Future<Output = axum::Json<Movie>> {movies_handler::create_movie}
+fn(State<Pool<Postgres>>, axum::Json<NewMovie>, Extension<i32>) -> impl std::future::Future<Output = axum::Json<Movie>> {movies_handler::create_movie}: Handler<_, _>

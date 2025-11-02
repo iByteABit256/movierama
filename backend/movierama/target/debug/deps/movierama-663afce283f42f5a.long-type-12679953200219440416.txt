@@ -1,0 +1,2 @@
+fn({type error}, axum::Json<models::NewMovie>, std::string::String) -> impl std::future::Future<Output = axum::Json<models::Movie>> {handlers::movies_handler::create_movie}
+fn({type error}, axum::Json<models::NewMovie>, std::string::String) -> impl std::future::Future<Output = axum::Json<models::Movie>> {handlers::movies_handler::create_movie}: axum::handler::Handler<_, _>

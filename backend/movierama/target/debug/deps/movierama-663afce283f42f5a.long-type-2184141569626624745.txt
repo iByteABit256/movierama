@@ -1,0 +1,2 @@
+fn(axum::extract::State<sqlx::Pool<sqlx::Postgres>>, axum::Json<models::NewMovie>, axum::Extension<i32>) -> impl std::future::Future<Output = axum::Json<models::Movie>> {handlers::movies_handler::create_movie}
+fn(axum::extract::State<sqlx::Pool<sqlx::Postgres>>, axum::Json<models::NewMovie>, axum::Extension<i32>) -> impl std::future::Future<Output = axum::Json<models::Movie>> {handlers::movies_handler::create_movie}: axum::handler::Handler<_, _>
