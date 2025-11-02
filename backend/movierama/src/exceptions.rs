@@ -12,6 +12,8 @@ pub enum MovieramaError {
     DatabaseError(#[from] sqlx::Error),
     #[error("Movie not found")]
     NotFound,
+    #[error("Unexpected error: {0}")]
+    UnexpectedError(String),
 }
 
 impl IntoResponse for MovieramaError {
@@ -21,6 +23,7 @@ impl IntoResponse for MovieramaError {
                 (StatusCode::INTERNAL_SERVER_ERROR, self.to_string())
             }
             MovieramaError::NotFound => (StatusCode::NOT_FOUND, self.to_string()),
+            MovieramaError::UnexpectedError(e) => (StatusCode::INTERNAL_SERVER_ERROR, e),
         };
 
         let body = Json(json!({

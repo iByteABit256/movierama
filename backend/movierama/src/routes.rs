@@ -1,5 +1,8 @@
-use crate::handlers::movies_handler;
-use axum::{Router, routing::get};
+use crate::handlers::{auth_handler, movies_handler};
+use axum::{
+    Router,
+    routing::{get, post},
+};
 use sqlx::PgPool;
 
 pub fn create_router(pool: PgPool) -> Router {
@@ -15,7 +18,12 @@ pub fn create_router(pool: PgPool) -> Router {
                 .put(movies_handler::update_movie),
         );
 
+    let auth_routes = Router::new()
+        .route("/register", post(auth_handler::register))
+        .route("/login", post(auth_handler::login));
+
     Router::new()
         .nest("/api/v1/movies", movie_routes)
+        .nest("/api/v1/auth", auth_routes)
         .with_state(pool)
 }

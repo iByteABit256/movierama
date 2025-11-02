@@ -28,6 +28,24 @@ pub struct User {
     // pub movies: Option<Vec<MovieSummary>>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RegisterUser {
+    pub username: String,
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LoginUser {
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AuthResponse {
+    pub token: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Movie {
     pub id: i32,
