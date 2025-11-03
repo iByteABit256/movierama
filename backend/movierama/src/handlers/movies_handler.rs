@@ -1,4 +1,5 @@
 use crate::{
+    auth::Claims,
     exceptions::MovieramaError,
     models::{Movie, NewMovie},
     services::movie_service,
@@ -11,13 +12,17 @@ use serde_json::{Value, json};
 use sqlx::PgPool;
 
 /// GET /movies
-pub async fn list_movies(State(pool): State<PgPool>) -> Result<Json<Vec<Movie>>, MovieramaError> {
+pub async fn list_movies(
+    _claims: Claims,
+    State(pool): State<PgPool>,
+) -> Result<Json<Vec<Movie>>, MovieramaError> {
     let movies = movie_service::list_all_movies(&pool).await?;
     Ok(Json(movies))
 }
 
 /// GET /movies/{movie_id}
 pub async fn get_movie(
+    _claims: Claims,
     State(pool): State<PgPool>,
     Path(movie_id): Path<i32>,
 ) -> Result<Json<Movie>, MovieramaError> {
@@ -30,6 +35,7 @@ pub async fn get_movie(
 
 /// UPDATE /movies/{movie_id}
 pub async fn update_movie(
+    _claims: Claims,
     State(pool): State<PgPool>,
     Path(movie_id): Path<i32>,
     Json(payload): Json<NewMovie>,
@@ -40,6 +46,7 @@ pub async fn update_movie(
 
 /// POST /movies
 pub async fn create_movie(
+    _claims: Claims,
     State(pool): State<PgPool>,
     Json(payload): Json<NewMovie>,
 ) -> Result<Json<Movie>, MovieramaError> {
@@ -49,6 +56,7 @@ pub async fn create_movie(
 
 /// DELETE /movies/{movie_id}
 pub async fn delete_movie(
+    _claims: Claims,
     State(pool): State<PgPool>,
     Path(movie_id): Path<i32>,
 ) -> Result<Json<Value>, MovieramaError> {

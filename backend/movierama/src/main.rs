@@ -2,6 +2,7 @@ use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::net::SocketAddr;
 
+mod auth;
 mod exceptions;
 mod handlers;
 mod models;

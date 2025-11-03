@@ -1,4 +1,5 @@
 use crate::{
+    auth::Claims,
     exceptions::MovieramaError,
     models::{AuthResponse, LoginUser, RegisterUser, User},
 };
@@ -7,17 +8,9 @@ use argon2::{
     password_hash::{SaltString, rand_core::OsRng},
 };
 use jsonwebtoken::{EncodingKey, Header, encode};
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    sub: i32,
-    username: String,
-    exp: usize,
-}
-
-const JWT_SECRET: &str = "super-secret-key"; // TODO change later to env var
+const JWT_SECRET: &str = "JWT_SECRET";
 
 pub async fn register_user(pool: &PgPool, data: RegisterUser) -> Result<User, MovieramaError> {
     let salt = SaltString::generate(&mut OsRng);
@@ -85,10 +78,13 @@ pub async fn login_user(pool: &PgPool, data: LoginUser) -> Result<AuthResponse, 
         exp: expiration,
     };
 
+    let jwt_secret =
+        std::env::var(JWT_SECRET).map_err(|e| MovieramaError::UnexpectedError(e.to_string()))?;
+
     let token = encode(
         &Header::default(),
         &claims,
-        &EncodingKey::from_secret(JWT_SECRET.as_bytes()),
+        &EncodingKey::from_secret(jwt_secret.as_bytes()),
     )
     .map_err(|e| MovieramaError::UnexpectedError(e.to_string()))?;
 
