@@ -16,6 +16,8 @@ pub enum MovieramaError {
     UnexpectedError(String),
     #[error("User not authorized")]
     Unauthorized,
+    #[error("Bad request: {0}")]
+    BadRequest(String),
 }
 
 impl IntoResponse for MovieramaError {
@@ -27,6 +29,7 @@ impl IntoResponse for MovieramaError {
             MovieramaError::NotFound => (StatusCode::NOT_FOUND, self.to_string()),
             MovieramaError::UnexpectedError(e) => (StatusCode::INTERNAL_SERVER_ERROR, e),
             MovieramaError::Unauthorized => (StatusCode::UNAUTHORIZED, self.to_string()),
+            MovieramaError::BadRequest(e) => (StatusCode::BAD_REQUEST, e),
         };
 
         let body = Json(json!({

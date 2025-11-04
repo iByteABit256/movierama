@@ -1,15 +1,36 @@
+use std::str::FromStr;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::Type;
+
+use crate::exceptions::MovieramaError;
 
 //
 // ===== Enums =====
 //
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Type)]
+#[sqlx(type_name = "TEXT")]
+#[sqlx(rename_all = "UPPERCASE")]
 #[serde(rename_all = "UPPERCASE")]
 pub enum VoteType {
     Like,
     Hate,
+}
+
+impl FromStr for VoteType {
+    type Err = MovieramaError;
+
+    fn from_str(input: &str) -> Result<VoteType, Self::Err> {
+        match input {
+            "LIKE" => Ok(VoteType::Like),
+            "HATE" => Ok(VoteType::Hate),
+            _ => Err(MovieramaError::BadRequest(
+                "Invalid vote type, available options are 'LIKE' and 'HATE'.".to_owned(),
+            )),
+        }
+    }
 }
 
 //
@@ -23,9 +44,6 @@ pub struct User {
     pub email: String,
     #[serde(skip_serializing)] // don’t expose password in API responses
     pub password: String,
-    // Optional list of movies; useful for nested serialization later
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub movies: Option<Vec<MovieSummary>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -57,14 +75,6 @@ pub struct Movie {
     pub hate_count: u64,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Vote {
-    pub id: Option<i32>,
-    pub movie_id: i32,
-    pub user_id: i32,
-    pub vote_type: VoteType,
-}
-
 //
 // ===== Summary / DTO types =====
 //
@@ -75,12 +85,6 @@ pub struct UserSummary {
     pub username: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct MovieSummary {
-    pub id: i32,
-    pub title: String,
-}
-
 //
 // ===== DTOs for creation =====
 //
@@ -89,18 +93,4 @@ pub struct MovieSummary {
 pub struct NewMovie {
     pub title: String,
     pub description: Option<String>,
-    pub user_id: i32, // To be removed
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct NewUser {
-    pub username: String,
-    pub email: String,
-    pub password: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct NewVote {
-    pub movie_id: i64,
-    pub vote_type: VoteType,
 }

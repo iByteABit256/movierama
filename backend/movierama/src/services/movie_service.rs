@@ -92,8 +92,8 @@ pub async fn get_movie_by_id(
             id: m.user_id,
             username: m.username,
         },
-        like_count: 0,
-        hate_count: 0,
+        like_count: m.like_count as u64,
+        hate_count: m.hate_count as u64,
     });
 
     Ok(movie)
@@ -115,7 +115,11 @@ pub async fn delete_movie(pool: &PgPool, movie_id: i32) -> Result<bool, Movieram
     Ok(rows_affected > 0)
 }
 
-pub async fn create_movie(pool: &PgPool, data: NewMovie) -> Result<Movie, MovieramaError> {
+pub async fn create_movie(
+    pool: &PgPool,
+    user_id: i32,
+    data: NewMovie,
+) -> Result<Movie, MovieramaError> {
     let rec = sqlx::query_as!(
         MovieRow,
         r#"
@@ -133,7 +137,7 @@ pub async fn create_movie(pool: &PgPool, data: NewMovie) -> Result<Movie, Movier
         "#,
         data.title,
         data.description,
-        data.user_id,
+        user_id,
     )
     .fetch_one(pool)
     .await?;
@@ -165,8 +169,7 @@ pub async fn update_movie(
         WHERE id = $3
         RETURNING 
             title,
-            description,
-            user_id
+            description
         "#,
         data.title,
         data.description,

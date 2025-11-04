@@ -1,12 +1,14 @@
+use std::collections::HashMap;
+
 use crate::{
     auth::Claims,
     exceptions::MovieramaError,
-    models::{Movie, NewMovie},
-    services::movie_service,
+    models::{Movie, NewMovie, VoteType},
+    services::{movie_service, vote_service},
 };
 use axum::{
     Json,
-    extract::{Path, State},
+    extract::{Path, Query, State},
 };
 use serde_json::{Value, json};
 use sqlx::PgPool;
@@ -46,11 +48,11 @@ pub async fn update_movie(
 
 /// POST /movies
 pub async fn create_movie(
-    _claims: Claims,
+    claims: Claims,
     State(pool): State<PgPool>,
     Json(payload): Json<NewMovie>,
 ) -> Result<Json<Movie>, MovieramaError> {
-    let movie = movie_service::create_movie(&pool, payload).await?;
+    let movie = movie_service::create_movie(&pool, claims.sub, payload).await?;
     Ok(Json(movie))
 }
 
@@ -69,4 +71,24 @@ pub async fn delete_movie(
     } else {
         Err(MovieramaError::NotFound)
     }
+}
+
+/// POST /movies/{movie_id}/vote
+pub async fn vote_movie(
+    claims: Claims,
+    State(pool): State<PgPool>,
+    Path(movie_id): Path<i32>,
+    Query(params): Query<HashMap<String, String>>,
+) -> Result<Json<Movie>, MovieramaError> {
+    let tp: VoteType = match params.get("type") {
+        Some(tp) => tp.parse()?,
+        None => {
+            return Err(MovieramaError::BadRequest(
+                "type query parameter is required".to_owned(),
+            ));
+        }
+    };
+
+    let movie = vote_service::vote_movie(&pool, claims.sub, movie_id, tp).await?;
+    Ok(Json(movie))
 }
