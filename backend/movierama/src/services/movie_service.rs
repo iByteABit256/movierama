@@ -1,6 +1,7 @@
 use crate::{
     exceptions::MovieramaError,
     models::{Movie, NewMovie, UserSummary},
+    pagination::Pageable,
 };
 use chrono::Utc;
 use sqlx::{FromRow, PgPool};
@@ -17,9 +18,15 @@ pub struct MovieRow {
     pub hate_count: i64,
 }
 
-pub async fn list_all_movies(pool: &PgPool) -> Result<Vec<Movie>, MovieramaError> {
-    let rows = sqlx::query_as!(
-        MovieRow,
+pub async fn list_all_movies(
+    pool: &PgPool,
+    pageable: &Pageable,
+) -> Result<(Vec<Movie>, u64), MovieramaError> {
+    let offset = pageable.offset as i64;
+    let limit = pageable.page_size as i64;
+    let order_clause = pageable.sort.to_sql("m.date_added");
+
+    let query = format!(
         r#"
         SELECT
             m.id,
@@ -28,19 +35,27 @@ pub async fn list_all_movies(pool: &PgPool) -> Result<Vec<Movie>, MovieramaError
             m.date_added,
             u.id AS user_id,
             u.username,
-            COALESCE(SUM(CASE WHEN v.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS "like_count!: i64",
-            COALESCE(SUM(CASE WHEN v.type = 'HATE' THEN 1 ELSE 0 END), 0) AS "hate_count!: i64"
+            COALESCE(SUM(CASE WHEN v.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS like_count,
+            COALESCE(SUM(CASE WHEN v.type = 'HATE' THEN 1 ELSE 0 END), 0) AS hate_count
         FROM movies m
         JOIN users u ON m.user_id = u.id
         LEFT JOIN votes v ON v.movie_id = m.id
         GROUP BY m.id, u.id
-        ORDER BY m.date_added DESC
-        "#
-    )
-    .fetch_all(pool)
-    .await?;
+        ORDER BY {}
+        LIMIT $1 OFFSET $2
+        "#,
+        order_clause
+    );
 
-    Ok(rows
+    let rows = sqlx::query_as::<_, MovieRow>(&query)
+        .bind(limit)
+        .bind(offset)
+        .fetch_all(pool)
+        .await?;
+
+    let total_elements = rows.len() as u64;
+
+    let movies = rows
         .into_iter()
         .map(|r| Movie {
             id: r.id,
@@ -54,7 +69,68 @@ pub async fn list_all_movies(pool: &PgPool) -> Result<Vec<Movie>, MovieramaError
             like_count: r.like_count as u64,
             hate_count: r.hate_count as u64,
         })
-        .collect())
+        .collect();
+
+    Ok((movies, total_elements))
+}
+
+pub async fn list_all_movies_by_username(
+    pool: &PgPool,
+    pageable: &Pageable,
+    username: &str,
+) -> Result<(Vec<Movie>, u64), MovieramaError> {
+    let offset = pageable.offset as i64;
+    let limit = pageable.page_size as i64;
+    let order_clause = pageable.sort.to_sql("m.date_added");
+
+    let query = format!(
+        r#"
+        SELECT
+            m.id,
+            m.title,
+            m.description,
+            m.date_added,
+            u.id AS user_id,
+            u.username,
+            COALESCE(SUM(CASE WHEN v.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS like_count,
+            COALESCE(SUM(CASE WHEN v.type = 'HATE' THEN 1 ELSE 0 END), 0) AS hate_count
+        FROM movies m
+        JOIN users u ON m.user_id = u.id
+        LEFT JOIN votes v ON v.movie_id = m.id
+        WHERE username = $3
+        GROUP BY m.id, u.id
+        ORDER BY {}
+        LIMIT $1 OFFSET $2
+        "#,
+        order_clause
+    );
+
+    let rows = sqlx::query_as::<_, MovieRow>(&query)
+        .bind(limit)
+        .bind(offset)
+        .bind(username)
+        .fetch_all(pool)
+        .await?;
+
+    let total_elements = rows.len() as u64;
+
+    let movies = rows
+        .into_iter()
+        .map(|r| Movie {
+            id: r.id,
+            title: r.title,
+            description: r.description,
+            date_added: r.date_added,
+            user: UserSummary {
+                id: r.user_id,
+                username: r.username,
+            },
+            like_count: r.like_count as u64,
+            hate_count: r.hate_count as u64,
+        })
+        .collect();
+
+    Ok((movies, total_elements))
 }
 
 pub async fn get_movie_by_id(

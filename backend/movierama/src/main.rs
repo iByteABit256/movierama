@@ -6,6 +6,7 @@ mod auth;
 mod exceptions;
 mod handlers;
 mod models;
+mod pagination;
 mod routes;
 mod services;
 

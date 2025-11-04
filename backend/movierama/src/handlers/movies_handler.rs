@@ -4,22 +4,60 @@ use crate::{
     auth::Claims,
     exceptions::MovieramaError,
     models::{Movie, NewMovie, VoteType},
+    pagination::{Page, Pageable, Sort},
     services::{movie_service, vote_service},
 };
 use axum::{
     Json,
     extract::{Path, Query, State},
 };
+use serde::Deserialize;
 use serde_json::{Value, json};
 use sqlx::PgPool;
+
+#[derive(Deserialize)]
+pub struct PageableQuery {
+    pub page: Option<u32>,
+    pub size: Option<u32>,
+    pub sort: Option<String>,
+}
+
+const DEFAULT_PAGE: u32 = 0;
+const DEFAULT_SIZE: u32 = 10;
+const DEFAULT_SORT: &str = "dateAdded,desc";
 
 /// GET /movies
 pub async fn list_movies(
     _claims: Claims,
     State(pool): State<PgPool>,
-) -> Result<Json<Vec<Movie>>, MovieramaError> {
-    let movies = movie_service::list_all_movies(&pool).await?;
-    Ok(Json(movies))
+    Query(params): Query<PageableQuery>,
+) -> Result<Json<Page<Movie>>, MovieramaError> {
+    let page = params.page.unwrap_or(DEFAULT_PAGE);
+    let size = params.size.unwrap_or(DEFAULT_SIZE);
+    let sort = Sort::from_query(&params.sort.unwrap_or(DEFAULT_SORT.to_string()));
+
+    let pageable = Pageable::new(page, size, sort.clone());
+
+    let (movies, total_elements) = movie_service::list_all_movies(&pool, &pageable).await?;
+    Ok(Json(Page::new(movies, pageable, total_elements)))
+}
+
+/// GET /movies/{username}
+pub async fn list_movies_by_username(
+    _claims: Claims,
+    State(pool): State<PgPool>,
+    Query(params): Query<PageableQuery>,
+    Path(username): Path<String>,
+) -> Result<Json<Page<Movie>>, MovieramaError> {
+    let page = params.page.unwrap_or(DEFAULT_PAGE);
+    let size = params.size.unwrap_or(DEFAULT_SIZE);
+    let sort = Sort::from_query(&params.sort.unwrap_or(DEFAULT_SORT.to_string()));
+
+    let pageable = Pageable::new(page, size, sort.clone());
+
+    let (movies, total_elements) =
+        movie_service::list_all_movies_by_username(&pool, &pageable, &username).await?;
+    Ok(Json(Page::new(movies, pageable, total_elements)))
 }
 
 /// GET /movies/{movie_id}

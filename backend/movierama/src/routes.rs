@@ -17,6 +17,10 @@ pub fn create_router(pool: PgPool) -> Router {
                 .delete(movies_handler::delete_movie)
                 .put(movies_handler::update_movie),
         )
+        .route(
+            "/user/{username}",
+            get(movies_handler::list_movies_by_username),
+        )
         .route("/{id}/vote", post(movies_handler::vote_movie));
 
     let auth_routes = Router::new()
