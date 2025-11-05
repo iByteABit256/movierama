@@ -1,4 +1,4 @@
-use crate::handlers::{auth_handler, movies_handler};
+use crate::handlers::{auth_handler, movies_handler, votes_handler};
 use axum::{
     Router,
     http::{self, HeaderValue},
@@ -29,12 +29,15 @@ pub fn create_router(pool: PgPool) -> Router {
         )
         .route("/{id}/vote", post(movies_handler::vote_movie));
 
+    let vote_routes = Router::new().route("/user-votes", post(votes_handler::get_user_votes));
+
     let auth_routes = Router::new()
         .route("/register", post(auth_handler::register))
         .route("/login", post(auth_handler::login));
 
     Router::new()
         .nest("/api/v1/movies", movie_routes)
+        .nest("/api/v1/votes", vote_routes)
         .nest("/api/v1/auth", auth_routes)
         .layer(cors)
         .with_state(pool)

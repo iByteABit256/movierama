@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use sqlx::{FromRow, PgPool};
 
 use crate::{
@@ -124,4 +126,48 @@ pub async fn update_vote(
     .await?;
 
     Ok(())
+}
+
+pub async fn get_user_votes_for_movies(
+    pool: &PgPool,
+    user_id: i32,
+    movie_ids: &[i32],
+) -> Result<HashMap<i32, VoteType>, MovieramaError> {
+    if movie_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    // Create placeholders for the IN clause
+    let placeholders: Vec<String> = (1..=movie_ids.len()).map(|i| format!("${}", i)).collect();
+    let placeholders_str = placeholders.join(", ");
+
+    let query = format!(
+        r#"
+        SELECT movie_id, type
+        FROM votes
+        WHERE user_id = $1 AND movie_id IN ({})
+        "#,
+        placeholders_str
+    );
+
+    let mut query = sqlx::query_as::<_, (i32, String)>(&query).bind(user_id);
+
+    // Bind each movie_id parameter
+    for movie_id in movie_ids {
+        query = query.bind(movie_id);
+    }
+
+    let rows = query.fetch_all(pool).await?;
+
+    let votes_map = rows
+        .into_iter()
+        .filter_map(|(movie_id, vote_type_str)| {
+            vote_type_str
+                .parse::<VoteType>()
+                .ok()
+                .map(|vote_type| (movie_id, vote_type))
+        })
+        .collect();
+
+    Ok(votes_map)
 }
