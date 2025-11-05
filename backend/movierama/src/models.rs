@@ -69,9 +69,12 @@ pub struct Movie {
     pub id: i32,
     pub title: String,
     pub description: Option<String>,
+    #[serde(rename = "dateAdded")]
     pub date_added: DateTime<Utc>,
     pub user: UserSummary,
+    #[serde(rename = "likeCount")]
     pub like_count: u64,
+    #[serde(rename = "hateCount")]
     pub hate_count: u64,
 }
 
