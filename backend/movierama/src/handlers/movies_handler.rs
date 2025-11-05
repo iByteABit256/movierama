@@ -90,7 +90,7 @@ pub async fn create_movie(
     State(pool): State<PgPool>,
     Json(payload): Json<NewMovie>,
 ) -> Result<Json<Movie>, MovieramaError> {
-    let movie = movie_service::create_movie(&pool, claims.sub, payload).await?;
+    let movie = movie_service::create_movie(&pool, claims.user_id, payload).await?;
     Ok(Json(movie))
 }
 
@@ -127,6 +127,6 @@ pub async fn vote_movie(
         }
     };
 
-    let movie = vote_service::vote_movie(&pool, claims.sub, movie_id, tp).await?;
+    let movie = vote_service::vote_movie(&pool, claims.user_id, movie_id, tp).await?;
     Ok(Json(movie))
 }

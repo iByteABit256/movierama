@@ -8,6 +8,6 @@ pub async fn get_user_votes(
     State(pool): State<sqlx::PgPool>,
     Json(movie_ids): Json<Vec<i32>>,
 ) -> Result<Json<HashMap<i32, VoteType>>, MovieramaError> {
-    let votes = vote_service::get_user_votes_for_movies(&pool, claims.sub, &movie_ids).await?;
+    let votes = vote_service::get_user_votes_for_movies(&pool, claims.user_id, &movie_ids).await?;
     Ok(Json(votes))
 }

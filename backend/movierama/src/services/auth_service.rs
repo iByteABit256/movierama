@@ -73,8 +73,8 @@ pub async fn login_user(pool: &PgPool, data: LoginUser) -> Result<AuthResponse, 
         .timestamp() as usize;
 
     let claims = Claims {
-        sub: user.id,
-        username: user.username.clone(),
+        sub: user.username.clone(),
+        user_id: user.id,
         exp: expiration,
     };
 

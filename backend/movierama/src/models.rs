@@ -72,9 +72,9 @@ pub struct Movie {
     #[serde(rename = "dateAdded")]
     pub date_added: DateTime<Utc>,
     pub username: String,
-    #[serde(rename = "likeCount")]
+    #[serde(rename = "likes")]
     pub like_count: u64,
-    #[serde(rename = "hateCount")]
+    #[serde(rename = "hates")]
     pub hate_count: u64,
 }
 
