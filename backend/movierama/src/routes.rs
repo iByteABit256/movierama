@@ -1,11 +1,17 @@
 use crate::handlers::{auth_handler, movies_handler};
 use axum::{
     Router,
+    http::{self, HeaderValue},
     routing::{get, post},
 };
 use sqlx::PgPool;
+use tower_http::cors::CorsLayer;
 
 pub fn create_router(pool: PgPool) -> Router {
+    let cors = CorsLayer::new()
+        .allow_headers([http::header::CONTENT_TYPE])
+        .allow_origin("http://localhost:5173".parse::<HeaderValue>().unwrap());
+
     let movie_routes = Router::new()
         .route(
             "/",
@@ -30,5 +36,6 @@ pub fn create_router(pool: PgPool) -> Router {
     Router::new()
         .nest("/api/v1/movies", movie_routes)
         .nest("/api/v1/auth", auth_routes)
+        .layer(cors)
         .with_state(pool)
 }

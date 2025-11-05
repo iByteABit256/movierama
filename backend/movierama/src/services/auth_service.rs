@@ -42,9 +42,9 @@ pub async fn login_user(pool: &PgPool, data: LoginUser) -> Result<AuthResponse, 
         r#"
         SELECT id, username, email, password
         FROM users
-        WHERE email = $1
+        WHERE username = $1
         "#,
-        data.email,
+        data.username,
     )
     .fetch_optional(pool)
     .await?;
