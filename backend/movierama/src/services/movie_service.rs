@@ -1,6 +1,6 @@
 use crate::{
     exceptions::MovieramaError,
-    models::{Movie, NewMovie, UserSummary},
+    models::{Movie, NewMovie},
     pagination::Pageable,
 };
 use chrono::Utc;
@@ -12,7 +12,6 @@ pub struct MovieRow {
     pub title: String,
     pub description: Option<String>,
     pub date_added: chrono::DateTime<Utc>,
-    pub user_id: i32,
     pub username: String,
     pub like_count: i64,
     pub hate_count: i64,
@@ -33,7 +32,6 @@ pub async fn list_all_movies(
             m.title,
             m.description,
             m.date_added,
-            u.id AS user_id,
             u.username,
             COALESCE(SUM(CASE WHEN v.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS like_count,
             COALESCE(SUM(CASE WHEN v.type = 'HATE' THEN 1 ELSE 0 END), 0) AS hate_count
@@ -62,10 +60,7 @@ pub async fn list_all_movies(
             title: r.title,
             description: r.description,
             date_added: r.date_added,
-            user: UserSummary {
-                id: r.user_id,
-                username: r.username,
-            },
+            username: r.username,
             like_count: r.like_count as u64,
             hate_count: r.hate_count as u64,
         })
@@ -90,7 +85,6 @@ pub async fn list_all_movies_by_username(
             m.title,
             m.description,
             m.date_added,
-            u.id AS user_id,
             u.username,
             COALESCE(SUM(CASE WHEN v.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS like_count,
             COALESCE(SUM(CASE WHEN v.type = 'HATE' THEN 1 ELSE 0 END), 0) AS hate_count
@@ -121,10 +115,7 @@ pub async fn list_all_movies_by_username(
             title: r.title,
             description: r.description,
             date_added: r.date_added,
-            user: UserSummary {
-                id: r.user_id,
-                username: r.username,
-            },
+            username: r.username,
             like_count: r.like_count as u64,
             hate_count: r.hate_count as u64,
         })
@@ -145,7 +136,6 @@ pub async fn get_movie_by_id(
             m.title,
             m.description,
             m.date_added,
-            u.id AS user_id,
             u.username,
             COALESCE(SUM(CASE WHEN v.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS "like_count!: i64",
             COALESCE(SUM(CASE WHEN v.type = 'HATE' THEN 1 ELSE 0 END), 0) AS "hate_count!: i64"
@@ -164,10 +154,7 @@ pub async fn get_movie_by_id(
         title: m.title,
         description: m.description,
         date_added: m.date_added,
-        user: UserSummary {
-            id: m.user_id,
-            username: m.username,
-        },
+        username: m.username,
         like_count: m.like_count as u64,
         hate_count: m.hate_count as u64,
     });
@@ -206,7 +193,6 @@ pub async fn create_movie(
             title,
             description,
             date_added,
-            $3 AS "user_id!: i32",
             (SELECT username FROM users WHERE id = $3) AS "username!: String",
             0 AS "like_count!: i64",
             0 AS "hate_count!: i64"
@@ -223,10 +209,7 @@ pub async fn create_movie(
         title: rec.title,
         description: rec.description,
         date_added: rec.date_added,
-        user: UserSummary {
-            id: rec.user_id,
-            username: rec.username,
-        },
+        username: rec.username,
         like_count: 0,
         hate_count: 0,
     })

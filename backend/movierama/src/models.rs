@@ -71,21 +71,11 @@ pub struct Movie {
     pub description: Option<String>,
     #[serde(rename = "dateAdded")]
     pub date_added: DateTime<Utc>,
-    pub user: UserSummary,
+    pub username: String,
     #[serde(rename = "likeCount")]
     pub like_count: u64,
     #[serde(rename = "hateCount")]
     pub hate_count: u64,
-}
-
-//
-// ===== Summary / DTO types =====
-//
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct UserSummary {
-    pub id: i32,
-    pub username: String,
 }
 
 //
