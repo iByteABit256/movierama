@@ -25,6 +25,11 @@ pub async fn list_all_movies(
     let limit = pageable.page_size as i64;
     let order_clause = pageable.sort.to_sql("m.date_added");
 
+    let total_row = sqlx::query!("SELECT COUNT(*) as count FROM movies")
+        .fetch_one(pool)
+        .await?;
+    let total_elements = total_row.count.unwrap_or(0) as u64;
+
     let query = format!(
         r#"
         SELECT
@@ -51,8 +56,6 @@ pub async fn list_all_movies(
         .fetch_all(pool)
         .await?;
 
-    let total_elements = rows.len() as u64;
-
     let movies = rows
         .into_iter()
         .map(|r| Movie {
@@ -77,6 +80,19 @@ pub async fn list_all_movies_by_username(
     let offset = pageable.offset as i64;
     let limit = pageable.page_size as i64;
     let order_clause = pageable.sort.to_sql("m.date_added");
+
+    let total_row = sqlx::query!(
+        r#"
+        SELECT COUNT(*) as count
+        FROM movies m
+        JOIN users u ON m.user_id = u.id
+        WHERE u.username = $1
+        "#,
+        username
+    )
+    .fetch_one(pool)
+    .await?;
+    let total_elements = total_row.count.unwrap_or(0) as u64;
 
     let query = format!(
         r#"
@@ -105,8 +121,6 @@ pub async fn list_all_movies_by_username(
         .bind(username)
         .fetch_all(pool)
         .await?;
-
-    let total_elements = rows.len() as u64;
 
     let movies = rows
         .into_iter()

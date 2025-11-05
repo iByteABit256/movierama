@@ -79,7 +79,9 @@ impl Sort {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Pageable {
+    #[serde(rename = "pageNumber")]
     pub page_number: u32,
+    #[serde(rename = "pageSize")]
     pub page_size: u32,
     pub sort: Sort,
     pub offset: u64,
@@ -104,13 +106,16 @@ impl Pageable {
 pub struct Page<T> {
     pub content: Vec<T>,
     pub pageable: Pageable,
+    #[serde(rename = "totalPages")]
     pub total_pages: u32,
+    #[serde(rename = "totalElements")]
     pub total_elements: u64,
     pub last: bool,
     pub size: u32,
     pub number: u32,
     pub sort: Sort,
     pub first: bool,
+    #[serde(rename = "numberOfElements")]
     pub number_of_elements: u32,
     pub empty: bool,
 }
