@@ -1,6 +1,6 @@
 use crate::{
     exceptions::MovieramaError,
-    models::{AuthResponse, LoginUser, RegisterUser, User},
+    models::{AuthResponse, LoginUser, RegisterUser},
     services::auth_service,
 };
 use axum::{Json, extract::State};
@@ -10,7 +10,7 @@ use sqlx::PgPool;
 pub async fn register(
     State(pool): State<PgPool>,
     Json(payload): Json<RegisterUser>,
-) -> Result<Json<User>, MovieramaError> {
+) -> Result<Json<AuthResponse>, MovieramaError> {
     let user = auth_service::register_user(&pool, payload).await?;
     Ok(Json(user))
 }

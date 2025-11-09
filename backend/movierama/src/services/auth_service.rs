@@ -12,14 +12,17 @@ use sqlx::PgPool;
 
 const JWT_SECRET: &str = "JWT_SECRET";
 
-pub async fn register_user(pool: &PgPool, data: RegisterUser) -> Result<User, MovieramaError> {
+pub async fn register_user(
+    pool: &PgPool,
+    data: RegisterUser,
+) -> Result<AuthResponse, MovieramaError> {
     let salt = SaltString::generate(&mut OsRng);
     let hashed = Argon2::default()
         .hash_password(data.password.as_bytes(), &salt)
         .map_err(|e| MovieramaError::UnexpectedError(e.to_string()))?
         .to_string();
 
-    let rec = sqlx::query_as!(
+    let user = sqlx::query_as!(
         User,
         r#"
         INSERT INTO users (username, email, password)
@@ -33,7 +36,9 @@ pub async fn register_user(pool: &PgPool, data: RegisterUser) -> Result<User, Mo
     .fetch_one(pool)
     .await?;
 
-    Ok(rec)
+    let token = create_token(user, &data.password)?;
+
+    Ok(AuthResponse { token })
 }
 
 pub async fn login_user(pool: &PgPool, data: LoginUser) -> Result<AuthResponse, MovieramaError> {
@@ -54,16 +59,20 @@ pub async fn login_user(pool: &PgPool, data: LoginUser) -> Result<AuthResponse, 
         None => return Err(MovieramaError::NotFound),
     };
 
+    let token = create_token(user, &data.password)?;
+
+    Ok(AuthResponse { token })
+}
+
+fn create_token(user: User, password: &str) -> Result<String, MovieramaError> {
     let parsed_hash = PasswordHash::new(&user.password)
         .map_err(|e| MovieramaError::UnexpectedError(e.to_string()))?;
 
     if Argon2::default()
-        .verify_password(data.password.as_bytes(), &parsed_hash)
+        .verify_password(password.as_bytes(), &parsed_hash)
         .is_err()
     {
-        return Err(MovieramaError::UnexpectedError(
-            "Invalid credentials".into(),
-        ));
+        return Err(MovieramaError::Unauthorized);
     }
 
     // Create JWT
@@ -88,5 +97,5 @@ pub async fn login_user(pool: &PgPool, data: LoginUser) -> Result<AuthResponse, 
     )
     .map_err(|e| MovieramaError::UnexpectedError(e.to_string()))?;
 
-    Ok(AuthResponse { token })
+    Ok(token)
 }
