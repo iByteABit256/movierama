@@ -24,7 +24,7 @@ async fn main() -> anyhow::Result<()> {
 
     let app = routes::create_router(pool);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 9000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 9000));
     tracing::info!("Listening on http://{}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await?;

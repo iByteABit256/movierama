@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n         SELECT id, user_id, movie_id, type as vote_type\n         FROM votes  \n         WHERE user_id = $1\n         AND movie_id = $2\n       ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "movie_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "vote_type",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "91304bbcd4ce6d5558369242b2600360efebd4ee99df8745cd34d9c31fe027ba"
+}
