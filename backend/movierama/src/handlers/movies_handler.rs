@@ -28,7 +28,6 @@ const DEFAULT_SORT: &str = "dateAdded,desc";
 
 /// GET /movies
 pub async fn list_movies(
-    _claims: Claims,
     State(pool): State<PgPool>,
     Query(params): Query<PageableQuery>,
 ) -> Result<Json<Page<Movie>>, MovieramaError> {
@@ -44,7 +43,6 @@ pub async fn list_movies(
 
 /// GET /movies/{username}
 pub async fn list_movies_by_username(
-    _claims: Claims,
     State(pool): State<PgPool>,
     Query(params): Query<PageableQuery>,
     Path(username): Path<String>,
@@ -62,7 +60,6 @@ pub async fn list_movies_by_username(
 
 /// GET /movies/{movie_id}
 pub async fn get_movie(
-    _claims: Claims,
     State(pool): State<PgPool>,
     Path(movie_id): Path<i32>,
 ) -> Result<Json<Movie>, MovieramaError> {
