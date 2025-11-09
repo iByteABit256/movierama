@@ -1,25 +1,3 @@
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../store/auth'
-
-const router = useRouter()
-const authStore = useAuthStore()
-
-const username = ref('')
-const password = ref('')
-const error = ref('')
-
-async function login() {
-  try {
-    await authStore.login(username.value, password.value)
-    router.push('/')
-  } catch {
-    error.value = 'Invalid username or password'
-  }
-}
-</script>
-
 <template>
   <div class="form-container">
     <h2>Login</h2>
@@ -41,3 +19,25 @@ async function login() {
 <style scoped>
 @import '../styles/form.css';
 </style>
+
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../store/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const username = ref('')
+const password = ref('')
+const error = ref('')
+
+async function login() {
+  try {
+    await authStore.login(username.value, password.value)
+    router.push('/')
+  } catch {
+    error.value = 'Invalid username or password'
+  }
+}
+</script>

@@ -3,7 +3,7 @@ services:
     image: postgres:15-alpine
     container_name: movierama-postgres
     environment:
-      POSTGRES_DB: movierama
+      POSTGRES_DB: movierama_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -12,25 +12,23 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - movierama-network
-
+  
   backend:
     build:
       context: ./backend/movierama
+      dockerfile: Dockerfile
     container_name: movierama-backend
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movierama
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/movierama_db
       JWT_SECRET: "replace-this-with-a-secure-long-secret"
-      JWT_EXPIRATION_MS: 86400000 # 24h in milliseconds
+      RUST_LOG: "info"
     depends_on:
       - postgres
     ports:
       - "9000:9000"
     networks:
       - movierama-network
-
+  
   frontend:
     build:
       context: ./frontend/movierama
@@ -48,3 +46,4 @@ volumes:
 networks:
   movierama-network:
     driver: bridge
+    

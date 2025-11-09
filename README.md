@@ -1,6 +1,6 @@
 # 🎬 Movierama
 
-Movierama is a social movie sharing platform where users can share their favorite movies, like or hate movies, and explore submissions from other users. This project is part of a Developer assignment for a practical assessment.
+Movierama is a social movie sharing platform where users can share their favorite movies, like or hate movies, and explore submissions from other users.
 
 ---
 
@@ -20,8 +20,6 @@ Movierama is a social movie sharing platform where users can share their favorit
   - Number of likes
   - Number of hates
 - Movies can be **sorted** by likes, hates, or publication date.
-- Additional features:
-  - Mock data preloaded in the **dev** profile for easy testing/demo.
 
 ---
 
@@ -29,7 +27,7 @@ Movierama is a social movie sharing platform where users can share their favorit
 
 | Layer        | Technology                        |
 | ------------ | --------------------------------- |
-| Backend      | Spring Boot, Gradle               |
+| Backend      | Rust, actix, sqlx                 |
 | Database     | PostgreSQL                        |
 | Frontend     | Vue.js, Bun                       |
 | Containerization | Docker, Docker Compose        |
@@ -47,9 +45,7 @@ Movierama is fully containerized with Docker. The backend, frontend, and databas
 
 ---
 
-### Start the Application (Dev Profile)
-
-The backend runs with the `dev` profile by default, preloading mock data:
+### Start the Application
 
 ```bash
 docker compose up --build

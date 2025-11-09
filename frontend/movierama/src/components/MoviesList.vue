@@ -250,7 +250,6 @@ onMounted(loadMovies)
 watch(
   () => props.username,
   () => {
-    moviesStore.clearUserVotes()
     loadMovies()
   },
 )

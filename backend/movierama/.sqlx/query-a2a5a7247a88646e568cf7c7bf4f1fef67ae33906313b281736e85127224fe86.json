@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM votes\n        WHERE user_id = $1 AND movie_id = $2  \n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a2a5a7247a88646e568cf7c7bf4f1fef67ae33906313b281736e85127224fe86"
+}

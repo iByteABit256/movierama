@@ -1,15 +1,24 @@
-# Build stage
-FROM gradle:8.10.0-jdk21 AS builder
+FROM rust:1.91 AS builder
+
 WORKDIR /app
 COPY . .
-RUN gradle bootJar --no-daemon
 
-# Runtime stage
-FROM eclipse-temurin:21-jdk-alpine
+# Enable SQLx offline mode during build
+ENV SQLX_OFFLINE=true
+
+RUN cargo install --path .
+
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
+
 WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar app.jar
 
-# The profile can be overridden by ENV or docker-compose
-ENV SPRING_PROFILES_ACTIVE=prod
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY --from=builder /usr/local/cargo/bin/movierama /app/backend
+
+ENV RUST_LOG=info
+ENV DATABASE_URL=postgres://postgres:postgres@postgres:5432/movierama_db
+EXPOSE 9000
+
+CMD ["/app/backend"]
+

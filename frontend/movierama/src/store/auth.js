@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '../api/api'
+import { useMoviesStore } from './movies'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -29,6 +30,9 @@ export const useAuthStore = defineStore('auth', {
       this.token = data.token
       localStorage.setItem('token', data.token)
       this.user = { username }
+
+      const moviesStore = useMoviesStore()
+      moviesStore.clearUserVotes()
     },
 
     async register(username, email, password) {
@@ -36,6 +40,9 @@ export const useAuthStore = defineStore('auth', {
       this.token = data.token
       localStorage.setItem('token', data.token)
       this.user = { username }
+
+      const moviesStore = useMoviesStore()
+      moviesStore.clearUserVotes()
     },
 
     logout() {
