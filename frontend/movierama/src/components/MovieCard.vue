@@ -155,8 +155,4 @@ const vote = async (type) => {
   cursor: not-allowed;
   transform: none;
 }
-
-.votes button.disabled {
-  opacity: 0.6;
-}
 </style>
