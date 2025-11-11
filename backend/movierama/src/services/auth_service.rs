@@ -14,7 +14,7 @@ const JWT_SECRET: &str = "JWT_SECRET";
 
 pub async fn register_user(
     pool: &PgPool,
-    data: RegisterUser,
+    data: &RegisterUser,
 ) -> Result<AuthResponse, MovieramaError> {
     let salt = SaltString::generate(&mut OsRng);
     let hashed = Argon2::default()
@@ -41,7 +41,7 @@ pub async fn register_user(
     Ok(AuthResponse { token })
 }
 
-pub async fn login_user(pool: &PgPool, data: LoginUser) -> Result<AuthResponse, MovieramaError> {
+pub async fn login_user(pool: &PgPool, data: &LoginUser) -> Result<AuthResponse, MovieramaError> {
     let user = sqlx::query_as!(
         User,
         r#"
@@ -98,4 +98,104 @@ fn create_token(user: User, password: &str) -> Result<String, MovieramaError> {
     .map_err(|e| MovieramaError::UnexpectedError(e.to_string()))?;
 
     Ok(token)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sqlx::PgPool;
+
+    #[sqlx::test(migrations = "./migrations")]
+    async fn test_register_user_success(pool: PgPool) {
+        let data = RegisterUser {
+            username: "user1".into(),
+            email: "user1@mail.com".into(),
+            password: "password".into(),
+        };
+
+        let result = register_user(&pool, &data).await.unwrap();
+        assert!(!result.token.is_empty());
+    }
+
+    #[sqlx::test(migrations = "./migrations")]
+    async fn test_login_user_success(pool: PgPool) {
+        // Register user
+        register_user(
+            &pool,
+            &RegisterUser {
+                username: "demo".into(),
+                email: "demo@mail.com".into(),
+                password: "password".into(),
+            },
+        )
+        .await
+        .unwrap();
+
+        // Login
+        let resp = login_user(
+            &pool,
+            &LoginUser {
+                username: "demo".into(),
+                password: "password".into(),
+            },
+        )
+        .await
+        .unwrap();
+
+        assert!(!resp.token.is_empty());
+    }
+
+    #[sqlx::test(migrations = "./migrations")]
+    async fn test_login_user_wrong_password(pool: PgPool) {
+        register_user(
+            &pool,
+            &RegisterUser {
+                username: "pavlos".into(),
+                email: "pavlos@mail.com".into(),
+                password: "password".into(),
+            },
+        )
+        .await
+        .unwrap();
+
+        let result = login_user(
+            &pool,
+            &LoginUser {
+                username: "pavlos".into(),
+                password: "wrongpass".into(),
+            },
+        )
+        .await;
+
+        assert!(matches!(result, Err(MovieramaError::Unauthorized)));
+    }
+
+    #[sqlx::test(migrations = "./migrations")]
+    async fn test_login_user_not_found(pool: PgPool) {
+        let result = login_user(
+            &pool,
+            &LoginUser {
+                username: "ghost".into(),
+                password: "password".into(),
+            },
+        )
+        .await;
+
+        assert!(matches!(result, Err(MovieramaError::NotFound)));
+    }
+
+    #[sqlx::test(migrations = "./migrations")]
+    async fn test_register_user_duplicate_username(pool: PgPool) {
+        let data = RegisterUser {
+            username: "dup".into(),
+            email: "dup@mail.com".into(),
+            password: "password".into(),
+        };
+
+        register_user(&pool, &data).await.unwrap();
+
+        let duplicate = register_user(&pool, &data).await;
+
+        assert!(matches!(duplicate, Err(MovieramaError::DatabaseError(_))));
+    }
 }
