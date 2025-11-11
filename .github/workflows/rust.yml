@@ -9,6 +9,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   SQLX_OFFLINE: true
+  JWT_TOKEN: this-is-a-really-long-secret-token
 
 jobs:
   build:
