@@ -2,7 +2,7 @@ spring:
   application:
     name: movierama
   datasource:
-    url: jdbc:postgresql://localhost:5432/movierama
+    url: jdbc:postgresql://localhost:5432/movierama_db_spring
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver

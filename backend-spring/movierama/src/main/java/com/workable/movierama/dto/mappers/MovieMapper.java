@@ -10,16 +10,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", imports = VoteType.class)
 public interface MovieMapper {
   @Mapping(target = "username", expression = "java(movie.getUser().getUsername())")
-  @Mapping(
-      target = "likes",
-      expression =
-          "java(movie.getVotes() == null ? 0L : movie.getVotes().stream().filter(v -> v.getType()"
-              + " == VoteType.LIKE).count())")
-  @Mapping(
-      target = "hates",
-      expression =
-          "java(movie.getVotes() == null ? 0L : movie.getVotes().stream().filter(v -> v.getType()"
-              + " == VoteType.HATE).count())")
+  @Mapping(target = "likes", source = "likeCount")
+  @Mapping(target = "hates", source = "hateCount")
   public MovieDTO entityToDto(Movie movie);
 
   @Mapping(target = "id", ignore = true)
