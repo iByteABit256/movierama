@@ -62,28 +62,43 @@ docker compose down
 After starting, open http://localhost:5173.
 
 ---
+Perfect — based on your **new benchmark data** and Docker resource metrics, here’s the updated and polished README section for your **Performance Comparison**, including insights from your latest results and your dashboard image (`comparison_dashboard.png`):
+
+---
 
 ## ⚡ Performance Comparison — Rust vs. Spring Boot
 
-As part of the migration from the original **Java (Spring)** backend to the new **Rust (Axum)** backend, I did load tests using [Grafana k6](https://grafana.com/docs/k6/latest/).
+As part of the migration from the original **Java (Spring Boot)** backend to the new **Rust (Axum)** backend, I performed detailed load and resource usage tests using [Grafana k6](https://grafana.com/docs/k6/latest/).
 
-The tests simulated a consistent load of **50 requests per second** over a fixed duration, measuring response latency and throughput for both implementations.
+The tests simulated a consistent load of **70 requests per second** for both backends over the same duration, capturing **latency metrics** and **Docker resource usage** (CPU and memory).
 
-| Metric                          |   Rust (Axum) | Spring Boot (Java) | Notes                                       |
-| :------------------------------ | ------------: | -----------------: | :------------------------------------------ |
-| **Average latency (avg)**       |  **≈ 2.7 ms** |          ≈ 17.7 ms | Rust handled requests ~6× faster on average |
-| **90th percentile (p90)**       |  **≈ 3.9 ms** |          ≈ 15.5 ms | 90% of Rust responses completed under 4 ms  |
-| **99th percentile (p99)**       | **≈ 12.5 ms** |           ≈ 276 ms | Spring showed occasional long GC pauses     |
-| **Requests per second (req/s)** |      50 req/s |           50 req/s | Identical test load for both                |
+| Metric                          |  Rust (Axum) | Spring Boot (Java) | Notes                                         |
+| :------------------------------ | -----------: | -----------------: | :-------------------------------------------- |
+| **Average latency (avg)**       | **≈ 1.7 ms** |           ≈ 6.2 ms | Rust handled requests ~3.5× faster on average |
+| **90th percentile (p90)**       | **≈ 4.0 ms** |           ≈ 9.6 ms | 90% of Rust responses completed under 4 ms    |
+| **99th percentile (p99)**       | **≈ 7.2 ms** |          ≈ 17.6 ms | Rust remains low-latency even at tail load    |
+| **Requests per second (req/s)** |     70 req/s |           70 req/s | Identical test load for both                  |
+
+---
 
 ### 🧩 Interpretation
 
-* **Rust (Axum)** delivers consistently low latency and minimal variance.
-* **Spring Boot** shows higher average latency and long-tail spikes due to JVM garbage collection and heavier threading.
-* **Overall**, the Rust backend is **significantly faster, leaner, and more predictable**, making it ideal for real-time APIs or resource-constrained deployments.
+* **🚀 Rust (Axum)** delivers much **lower latency** and **tighter consistency**, thanks to its zero-cost abstractions and async runtime efficiency.
+* **☕ Spring Boot**, while robust and feature-rich, incurs overhead from the JVM, garbage collection, and heavier threading, resulting in higher average and tail latencies.
+* **⚙️ CPU usage**: Rust’s CPU footprint was only a fraction of Spring’s, remaining under **5 %** even during steady load, whereas Spring Boot frequently spiked above **100 %**.
+* **🧠 Memory usage**: Rust consistently stayed around **5 MiB**, while Spring hovered between **300–360 MiB**, mostly due to JVM overhead.
+
+These results demonstrate that **Rust’s Axum-based backend is dramatically more efficient**, making it ideal for high-performance, resource-constrained, or latency-sensitive systems.
+
+---
 
 ### 📊 Visualization
 
-![comparison](assets/comparison-get-movies.png)
+![Performance Dashboard](assets/comparison_dashboard.png)
 
-The chart plots **average**, **p90**, and **p99** latencies for both backends side-by-side, clearly showing Rust’s tighter performance distribution.
+This dashboard summarizes:
+
+* **Top:** Latency comparison (avg, p90, p99, req/s)
+* **Middle:** CPU usage over time
+* **Bottom:** Memory usage over time
+
