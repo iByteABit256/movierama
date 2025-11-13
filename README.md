@@ -65,7 +65,7 @@ After starting, open http://localhost:5173.
 
 ## ⚡ Performance Comparison — Rust vs. Spring Boot
 
-As part of the migration from the original **Spring Boot (Java)** backend to the new **Rust (Axum)** backend, I did load tests using [Grafana k6](https://grafana.com/docs/k6/latest/).
+As part of the migration from the original **Java (Spring)** backend to the new **Rust (Actix)** backend, I did load tests using [Grafana k6](https://grafana.com/docs/k6/latest/).
 
 The tests simulated a consistent load of **50 requests per second** over a fixed duration, measuring response latency and throughput for both implementations.
 
