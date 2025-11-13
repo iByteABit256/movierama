@@ -1,0 +1,46 @@
+package com.workable.movierama.service;
+
+import com.workable.movierama.dto.RegisterUserDTO;
+import com.workable.movierama.dto.UserDTO;
+import com.workable.movierama.dto.mappers.UserMapper;
+import com.workable.movierama.exception.MovieramaBaseException;
+import com.workable.movierama.exception.MovieramaNotFoundException;
+import com.workable.movierama.model.User;
+import com.workable.movierama.persistence.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
+
+  public List<UserDTO> getAllUsers() {
+    return userRepository.findAll().stream()
+        .map(userMapper::entityToDto)
+        .collect(Collectors.toList());
+  }
+
+  public UserDTO getUserById(Long id) {
+    return userRepository
+        .findById(id)
+        .map(userMapper::entityToDto)
+        .orElseThrow(() -> new MovieramaNotFoundException("User not found"));
+  }
+
+  public UserDTO registerUser(RegisterUserDTO dto) {
+    if (userRepository.findByUsername(dto.username()).isPresent()) {
+      throw new MovieramaBaseException("Username already exists");
+    }
+
+    final User user =
+        User.builder().username(dto.username()).password(dto.password()).email(dto.email()).build();
+
+    userRepository.save(user);
+    return userMapper.entityToDto(user);
+  }
+}

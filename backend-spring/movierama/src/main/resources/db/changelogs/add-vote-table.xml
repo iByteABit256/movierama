@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="add-vote-table-1" author="movierama" >
+        <createTable tableName="votes">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="movie_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_vote_movie"
+                             referencedTableName="movies" referencedColumnNames="id"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_vote_user"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="votes"
+                columnNames="movie_id, user_id"
+                constraintName="uc_vote_movie_user"/>
+
+        <createIndex indexName="idx_votes_movie_id" tableName="votes">
+            <column name="movie_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_votes_user_id" tableName="votes">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
+
